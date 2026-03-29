@@ -33,6 +33,7 @@
     var cards = {};
     var decks = {};
     var roles = [];
+    var items_map = {}; // { name: { name, max_count, ... } }
     var activeDeck = null;
     var drawCounter = 1;
     var activeTimer = null;
@@ -54,7 +55,9 @@
         get pendingScoreChanges() { return pendingScoreChanges; },
         set pendingScoreChanges(v){ pendingScoreChanges = v; },
         get decks()            { return decks; },
+        get cards()            { return cards; },
         get roles()            { return roles; },
+        get items()            { return items_map; },
         get activeDeck()       { return activeDeck; },
     };
 
@@ -123,6 +126,7 @@
             if (isNext && !isCurrent) tags.push('▶');
             if (p.role) tags.push(p.role);
             tags.push(`${p.score ?? 0} 分`);
+            if (p.items && p.items.length) tags.push(`[${p.items.join(', ')}]`);
             metaEl.textContent = tags.join(' · ');
 
             row.appendChild(nameEl);
@@ -485,6 +489,8 @@
         }
 
         roles = (data.roles || []).map(r => ({ name: r.name, count: r.count || 1 }));
+        items_map = {};
+        (data.items || []).forEach(i => { items_map[i.name] = i; });
         drawMode = data.player_draw_mode ?? ROUND_PLAYER;
         drawModeRole = data.player_draw_mode_role || '';
 

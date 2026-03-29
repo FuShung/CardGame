@@ -82,6 +82,10 @@ input, textarea {
     font-size: var(--text-medium-size);
 }
 
+textarea {
+    min-height: 10rem;
+}
+
 input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
@@ -243,6 +247,14 @@ main {
     color: var(--text-primary);
 }
 
+p.main,
+span.main,
+label.main,
+.input-container.main {
+    width: 100%;
+    max-width: 50rem;
+}
+
 .input-container > label,
 .input-container > span,
 .input-container > p {
@@ -273,6 +285,22 @@ main {
     border-bottom-right-radius: var(--border-radius);
 }
 
+div.full-w {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+p.full-w,
+label.full-w,
+span.full-w {
+    width: 100%;
+}
+
+button.full-w,
+select.full-w,
+input.full-w,
 .input-container.full-w,
 .input-container.full-w > button,
 .input-container.full-w > select,

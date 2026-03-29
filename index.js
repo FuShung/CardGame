@@ -3,6 +3,9 @@ const pages = {
     game: {
         title: "首頁"
     },
+    item_editor: {
+        title: "道具編輯器"
+    },
     card_editor: {
         title: "卡牌編輯器",
         styles: [

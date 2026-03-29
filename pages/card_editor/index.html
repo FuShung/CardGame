@@ -1,5 +1,5 @@
 <!-- 卡牌編輯器 -->
-<div id="btn-group" class="input-container">
+<div id="btn-group" class="input-container main">
     <button id="select-card-btn" class="btn-lg btn-primary-dark">卡牌列表</button>
     <div class="combobox-wrap">
         <input id="input-card-search" type="text" placeholder="搜尋或輸入新卡牌名稱" autocomplete="off">
@@ -8,48 +8,66 @@
     <button id="btn-save-edit" class="btn-lg btn-primary-green">儲存</button>
     <button id="btn-delete-card" class="btn-lg btn-primary-red disabled">刪除</button>
 </div>
+<br />
+<h2 id="edit-card-name">卡牌</h2>
+<div id="edit-card-rarity-star" class="star-editor" for="edit-card-rarity"></div>
+<input id="edit-card-rarity" type="number" min="1" max="5" value="1" hidden>
 
-<div class="glass-card editor-card">
-    <h2 id="edit-card-name">卡牌</h2>
-    <div class="editor-header">
-        <div id="edit-card-rarity-star" class="star-editor" for="edit-card-rarity"></div>
-        <input id="edit-card-rarity" type="number" min="1" max="5" value="1" hidden>
-    </div>
+<!-- 效果內容 -->
+ 
+<div class="input-container main">
+    <span>抽卡條件</span>
+    <button id="btn-edit-requires" class="btn-primary-dark full-w">（無條件）</button>
+</div>
 
-    <div class="editor-body">
-        <!-- 效果內容 -->
-        <div class="input-container full-w">
-            <label for="edit-card-effect">內容</label>
-            <textarea id="edit-card-effect" placeholder="效果內容，如: 獲得 [100, 200] 點"></textarea>
-        </div>
+<div class="input-container main">
+    <label for="edit-card-effect">內容</label>
+    <textarea id="edit-card-effect" placeholder="效果內容，如: 獲得 [100, 200] 點"></textarea>
+</div>
 
-        <div class="input-container full-w">
-            <input id="edit-is-challenge" type="checkbox" class="input-check-green"
-                data-label-off="挑戰模式：關閉" data-label-on="挑戰模式：啟用">
-            <label>效果</label>
-            <select id="select-add-action">
-                <option value="">選擇效果類型</option>
-                <option value="score">積分</option>
-                <option value="swap_roles">身分交換</option>
-                <option value="change_draw_mode">抽卡模式</option>
-                <option value="change_draw_player">指定抽卡人員</option>
-                <option value="change_deck">切換牌組</option>
-            </select>
-            <button id="btn-add-action" class="btn-outline-green">＋ 新增</button>
-        </div>
-        
-        <!-- 效果列表 -->
-        <div id="section-actions">
-            <div class="editor-field-header">
-                
-            </div>
-            <div id="actions-list"></div>
-        </div>
-    </div>
+<div class="input-container main">
+    <label>效果</label>
+    <select id="select-add-action">
+        <option value="">選擇效果類型</option>
+        <option value="score">積分</option>
+        <option value="swap_roles">身分交換</option>
+        <option value="change_draw_mode">抽卡模式</option>
+        <option value="change_draw_player">指定抽卡人員</option>
+        <option value="change_deck">切換牌組</option>
+        <option value="item_changes">道具</option>
+    </select>
+    <button id="btn-add-action" class="btn-outline-green">＋ 新增</button>
+    <input id="edit-is-challenge" type="checkbox" class="input-check-green"
+        data-label-off="挑戰模式：關閉" data-label-on="挑戰模式：啟用">
+</div>
+<br />
+<div id="actions-list" class="full-w">
 </div>
 
 <div id="card-editor-modal" class="pop-modal hidden">
     <button class="modal-close" aria-label="關閉">✕</button>
     <h2>卡牌列表</h2>
     <div id="card-prototype-list" class="scale-list-container"></div>
+</div>
+
+<div id="requires-modal" class="pop-modal hidden">
+    <button class="modal-close" aria-label="關閉">✕</button>
+    <h2>抽卡條件</h2>
+    <div class="requires-editor">
+        <div class="input-container">
+            <select id="requires-item-select"><option value="">選擇道具</option></select>
+            <button class="btn-outline-dark" data-insert="AND">AND</button>
+            <button class="btn-outline-dark" data-insert="OR">OR</button>
+            <button class="btn-outline-dark" data-insert="NOT">NOT</button>
+            <button class="btn-outline-dark" data-insert="(">(</button>
+            <button class="btn-outline-dark" data-insert=")">)</button>
+            <button class="btn-outline-dark" data-insert="()">()</button>
+        </div>
+        <textarea id="requires-expr" placeholder="例：道具A AND (道具B OR NOT 道具C)"></textarea>
+        <div id="requires-preview-msg" class="requires-msg"></div>
+        <div class="input-container full-w">
+            <button id="btn-requires-clear" class="btn-outline-red">清除</button>
+            <button id="btn-requires-confirm" class="btn-primary-green btn-lg">確認</button>
+        </div>
+    </div>
 </div>

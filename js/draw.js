@@ -30,17 +30,35 @@ function drawByDeck(deckName, state, lbDeckRemaining) {
     }
 
     const s = deck.runtimeStates;
+    // 過濾不符合 requires 條件的卡（RANDOM/REDRAW 模式）
+    const eligiblePool = (deck.draw_mode !== SEQUENCE_MODE && state.cards)
+        ? s.pool.filter(name => {
+            const card = state.cards[name];
+            return !card || checkCardRequires(card, state);
+          })
+        : s.pool;
+
     let cardName;
     switch (deck.draw_mode) {
         case RANDOM_MODE:
             s.remaining--;
         case REDRAW_MODE:
-            cardName = s.pool[Math.floor(Math.random() * s.pool.length)];
+            if (!eligiblePool.length) return '';
+            cardName = eligiblePool[Math.floor(Math.random() * eligiblePool.length)];
             break;
         case SEQUENCE_MODE:
-            cardName = s.pool[s.nextIdx];
-            s.remaining--;
-            s.nextIdx++;
+            // 順序模式：跳過不符合條件的卡
+            while (s.nextIdx < s.pool.length) {
+                const candidate = s.pool[s.nextIdx];
+                s.nextIdx++;
+                s.remaining--;
+                const card = state.cards && state.cards[candidate];
+                if (!card || checkCardRequires(card, state)) {
+                    cardName = candidate;
+                    break;
+                }
+            }
+            if (!cardName) return '';
             break;
     }
 

@@ -1,0 +1,27 @@
+<!-- 道具編輯器 -->
+<div id="btn-group" class="input-container main">
+    <button id="select-item-btn" class="btn-lg btn-primary-dark">道具列表</button>
+    <div class="combobox-wrap">
+        <input id="input-item-search" type="text" placeholder="搜尋或輸入新道具名稱" autocomplete="off">
+        <ul id="item-dropdown" class="card-dropdown hidden"></ul>
+    </div>
+    <button id="btn-save-item" class="btn-lg btn-primary-green">儲存</button>
+    <button id="btn-delete-item" class="btn-lg btn-primary-red disabled">刪除</button>
+</div>
+<br />
+<h2 id="edit-item-name">道具</h2>
+<div class="input-container main">
+    <label for="edit-item-max">可持有數量</label>
+    <input id="edit-item-max" type="number" min="1" value="1" placeholder="1">
+</div>
+
+<div class="input-container main">
+    <label for="edit-item-desc">描述</label>
+    <textarea id="edit-item-desc" placeholder="描述道具效果(保留功能)"></textarea>
+</div>
+
+<div id="item-editor-modal" class="pop-modal hidden">
+    <button class="modal-close" aria-label="關閉">✕</button>
+    <h2>道具列表</h2>
+    <div id="item-prototype-list" class="scale-list-container"></div>
+</div>

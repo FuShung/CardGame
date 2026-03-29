@@ -12,10 +12,15 @@
     const editCardEffect     = document.getElementById("edit-card-effect");
     const editCardRarity     = document.getElementById("edit-card-rarity");
     const editIsChallenge    = document.getElementById('edit-is-challenge');
+    const btnEditRequires    = document.getElementById('btn-edit-requires');
+    const requiresModal      = document.getElementById('requires-modal');    
+    const requiresExpr       = document.getElementById('requires-expr');
+    const requiresItemSelect = document.getElementById('requires-item-select');
     const actionsList        = document.getElementById('actions-list');
 
     var cards = {};
     var roles = [];
+    var items_list = [];
     var decks_list = {};
     var editingCard = null;
     var editingActions = [];
@@ -134,6 +139,9 @@
         editCardRarity.value = rarity;
         renderStarts(editCardRarityStar, rarity);
         editIsChallenge.checked = !!card.is_challenge;
+        const reqExpr = typeof card.requires === 'string' ? card.requires
+            : card.requires?.has ? card.requires.has.join(' AND ') : '';
+        setRequiresPreview(reqExpr);
 
         // 相容舊格式
         const legacy = [];
@@ -252,7 +260,7 @@
 
     function renderActionRow(action, idx) {
         const inner = document.createElement('div');
-        inner.className = 'input-container full-w';
+        inner.className = 'input-container main';
 
         const lbAction = document.createElement('label');
         inner.appendChild(lbAction);
@@ -396,6 +404,51 @@
             targetSel.addEventListener('change', () => { editingActions[idx].target = targetSel.value; });
             inner.appendChild(label);
             inner.appendChild(targetSel);
+
+        } else if (action.type === 'item_changes') {
+            lbAction.innerText = '道具';
+            // 切換按鈕：給予 / 移除（仿挑戰模式）
+            const modeBtn = document.createElement('button');
+            modeBtn.style.width = '5rem';
+            modeBtn.style.flexShrink = '0';
+            const isGive = !action.take || !action.take.length;
+            function updateModeBtn() {
+                const give = !editingActions[idx].take?.length;
+                modeBtn.textContent = give ? '給予' : '移除';
+                modeBtn.className   = give ? 'btn-primary-green' : 'btn-primary-red';
+            }
+            modeBtn.addEventListener('click', () => {
+                const a = editingActions[idx];
+                if (!a.take?.length) {
+                    // 切換到移除：把 give 的內容移到 take
+                    a.take = a.give || [];
+                    a.give = [];
+                } else {
+                    a.give = a.take;
+                    a.take = [];
+                }
+                updateModeBtn();
+            });
+            updateModeBtn();
+
+            const itemInput = document.createElement('input');
+            itemInput.type = 'text';
+            itemInput.placeholder = '道具A, 道具B';
+            itemInput.value = (isGive ? action.give : action.take || []).join(', ');
+            itemInput.addEventListener('input', () => {
+                const vals = itemInput.value.split(',').map(s => s.trim()).filter(Boolean);
+                const give = !editingActions[idx].take?.length;
+                if (give) { editingActions[idx].give = vals; editingActions[idx].take = []; }
+                else      { editingActions[idx].take = vals; editingActions[idx].give = []; }
+            });
+
+            const targetSel = document.createElement('select');
+            buildTargetOptions(targetSel, action.target || 'skip:0');
+            targetSel.addEventListener('change', () => { editingActions[idx].target = targetSel.value; });
+
+            inner.appendChild(modeBtn);
+            inner.appendChild(targetSel);
+            inner.appendChild(itemInput);
         }
 
         inner.appendChild(buildDelBtn(idx));
@@ -406,6 +459,85 @@
         actionsList.innerHTML = '';
         editingActions.forEach((action, idx) => actionsList.appendChild(renderActionRow(action, idx)));
     }
+
+    function setRequiresPreview(expr) {
+        if (expr) {
+            btnEditRequires.textContent = expr;
+            btnEditRequires.classList.remove('empty');
+        } else {
+            btnEditRequires.textContent = '（無條件）';
+            btnEditRequires.classList.add('empty');
+        }
+    }
+    document.getElementById('btn-edit-requires').addEventListener('click', () => {
+        requiresExpr.value = btnEditRequires.classList.contains('empty') ? '' : btnEditRequires.textContent;
+        updateRequiresPreview();
+        requiresModal.classList.remove('hidden');
+    });
+
+    requiresModal.querySelector('.modal-close').onclick = () => requiresModal.classList.add('hidden');
+
+    // 插入按鈕
+    requiresModal.querySelectorAll('[data-insert]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const ins = btn.dataset.insert;
+            const start = requiresExpr.selectionStart;
+            const end   = requiresExpr.selectionEnd;
+            const val   = requiresExpr.value;
+            const insert = ins === '(' || ins === ')' ? ins : ` ${ins} `;
+            requiresExpr.value = val.slice(0, start) + insert + val.slice(end);
+            requiresExpr.selectionStart = requiresExpr.selectionEnd = start + insert.length;
+            requiresExpr.focus();
+            updateRequiresPreview();
+        });
+    });
+
+    // 道具下拉插入
+    requiresItemSelect.addEventListener('change', () => {
+        const item = requiresItemSelect.value;
+        if (!item) return;
+        const start = requiresExpr.selectionStart;
+        const val   = requiresExpr.value;
+        requiresExpr.value = val.slice(0, start) + item + val.slice(start);
+        requiresExpr.selectionStart = requiresExpr.selectionEnd = start + item.length;
+        requiresExpr.focus();
+        requiresItemSelect.value = '';
+        updateRequiresPreview();
+    });
+
+    requiresExpr.addEventListener('input', updateRequiresPreview);
+
+    function updateRequiresPreview() {
+        const expr = requiresExpr.value.trim();
+        const msg = document.getElementById('requires-preview-msg');
+        if (!expr) { msg.textContent = '無條件限制'; msg.className = 'requires-msg'; return; }
+        // 簡單語法驗證：括號配對
+        let depth = 0;
+        for (const ch of expr) { if (ch === '(') depth++; else if (ch === ')') depth--; if (depth < 0) break; }
+        if (depth !== 0) { msg.textContent = '⚠ 括號不配對'; msg.className = 'requires-msg error'; }
+        else { msg.textContent = `條件：${expr}`; msg.className = 'requires-msg ok'; }
+    }
+
+    document.getElementById('btn-requires-clear').addEventListener('click', () => {
+        requiresExpr.value = '';
+        updateRequiresPreview();
+    });
+
+    document.getElementById('btn-requires-confirm').addEventListener('click', () => {
+        const expr = requiresExpr.value.trim();
+        setRequiresPreview(requiresExpr.value.trim());
+        requiresModal.classList.add('hidden');
+    });
+
+    function refreshRequiresItemSelect() {
+        requiresItemSelect.innerHTML = '<option value="">選擇道具插入</option>';
+        items_list.forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = item.name; opt.textContent = item.name;
+            requiresItemSelect.appendChild(opt);
+        });
+    }
+    // #endregion
 
     editIsChallenge.addEventListener('change', renderActionsList);
 
@@ -424,6 +556,8 @@
             editingActions.push({ type: 'change_draw_player', on: 'always', target: 'skip:1' });
         else if (type === 'change_deck')
             editingActions.push({ type: 'change_deck', on: 'always', target: Object.keys(decks_list)[0] || '' });
+        else if (type === 'item_changes')
+            editingActions.push({ type: 'item_changes', on: 'always', target: 'skip:0', give: [], take: [] });
         renderActionsList();
     });
     // #endregion
@@ -441,6 +575,8 @@
         card.effect       = editCardEffect.value.trim();
         card.rarity       = parseInt(editCardRarity.value) || 1;
         card.is_challenge = editIsChallenge.checked || undefined;
+        const reqExpr = btnEditRequires.classList.contains('empty') ? '' : btnEditRequires.textContent.trim();
+        card.requires = reqExpr || undefined;
         card.actions      = editingActions.length ? editingActions.map(a => ({ ...a })) : undefined;
         delete card.score_changes;
         delete card.score_success;
@@ -483,6 +619,8 @@
         roles = (data.roles || []).map(r => ({ name: r.name }));
         decks_list = {};
         (data.decks || []).forEach(d => { decks_list[d.name] = d; });
+        items_list = data.items || [];
+        refreshRequiresItemSelect();
         data.cards.forEach(c => { cards[c.name] = c; renderCard(c); });
 
         // 預設選第一張卡牌

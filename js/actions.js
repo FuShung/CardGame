@@ -126,6 +126,21 @@ function applyActions(card, trigger, state) {
                 card._resolved_next_deck = deckName;
                 results.push({ kind: 'change_deck', target: deckName });
             }
+
+        } else if (action.type === 'item_changes') {
+            const targets = resolveTarget(action.target || 'skip:0', state);
+            targets.forEach(idx => {
+                const p = state.players[idx];
+                if (!p) return;
+                if (!p.items) p.items = [];
+                if (action.give) {
+                    action.give.forEach(item => { if (!p.items.includes(item)) p.items.push(item); });
+                }
+                if (action.take) {
+                    action.take.forEach(item => { p.items = p.items.filter(i => i !== item); });
+                }
+            });
+            results.push({ kind: 'item_changes', targetLabel: resolveTargetLabel(action.target || 'skip:0', state), give: action.give || [], take: action.take || [] });
         }
     });
 
@@ -195,5 +210,130 @@ function formatActionResult(r, state) {
         return `指定抽卡：${t}`;
     }
     if (r.kind === 'change_deck') return `切換牌組：${r.target}`;
+    if (r.kind === 'item_changes') {
+        const parts = [];
+        if (r.give.length) parts.push(`獲得：${r.give.join('、')}`);
+        if (r.take.length) parts.push(`失去：${r.take.join('、')}`);
+        return `${r.targetLabel}道具 ${parts.join('，')}`;
+    }
     return '';
+}
+
+/**
+ * 解析並評估 requires 表達式
+ * 語法：道具名稱、AND、OR、NOT、()
+ * 例：道具A AND (道具B OR NOT 道具C)
+ */
+function evalRequiresExpr(expr, items) {
+    if (!expr || !expr.trim()) return true;
+    const tokens = tokenizeRequires(expr);
+    try {
+        const [result] = parseRequiresOr(tokens, 0, items);
+        return result;
+    } catch (e) {
+        return true; // 解析失敗視為無條件
+    }
+}
+
+function tokenizeRequires(expr) {
+    const tokens = [];
+    const re = /\bAND\b|\bOR\b|\bNOT\b|[()]/g;
+    let last = 0, m;
+    while ((m = re.exec(expr)) !== null) {
+        const before = expr.slice(last, m.index).trim();
+        if (before) tokens.push({ type: 'item', value: before });
+        tokens.push({ type: m[0] === '(' || m[0] === ')' ? m[0] : 'op', value: m[0] });
+        last = re.lastIndex;
+    }
+    const tail = expr.slice(last).trim();
+    if (tail) tokens.push({ type: 'item', value: tail });
+    return tokens;
+}
+
+function parseRequiresOr(tokens, pos, items) {
+    let [left, p] = parseRequiresAnd(tokens, pos, items);
+    while (p < tokens.length && tokens[p]?.value === 'OR') {
+        const [right, np] = parseRequiresAnd(tokens, p + 1, items);
+        left = left || right;
+        p = np;
+    }
+    return [left, p];
+}
+
+function parseRequiresAnd(tokens, pos, items) {
+    let [left, p] = parseRequiresNot(tokens, pos, items);
+    while (p < tokens.length && tokens[p]?.value === 'AND') {
+        const [right, np] = parseRequiresNot(tokens, p + 1, items);
+        left = left && right;
+        p = np;
+    }
+    return [left, p];
+}
+
+function parseRequiresNot(tokens, pos, items) {
+    if (tokens[pos]?.value === 'NOT') {
+        const [val, np] = parseRequiresPrimary(tokens, pos + 1, items);
+        return [!val, np];
+    }
+    return parseRequiresPrimary(tokens, pos, items);
+}
+
+function parseRequiresPrimary(tokens, pos, items) {
+    if (tokens[pos]?.value === '(') {
+        const [val, np] = parseRequiresOr(tokens, pos + 1, items);
+        return [val, np + 1]; // skip ')'
+    }
+    if (tokens[pos]?.type === 'item') {
+        return [items.includes(tokens[pos].value), pos + 1];
+    }
+    return [true, pos];
+}
+
+function checkCardRequires(card, state) {
+    const expr = card.requires;
+    if (!expr || typeof expr !== 'string' || !expr.trim()) {
+        // 即使無 requires，仍需檢查 item_changes 的道具數量限制
+        return checkItemChangesEligible(card, state);
+    }
+    const player = state.players[state.currentPlayerIdx];
+    if (!player) return true;
+    if (!evalRequiresExpr(expr, player.items || [])) return false;
+    return checkItemChangesEligible(card, state);
+}
+
+/**
+ * 檢查卡牌的 item_changes action 是否符合玩家道具狀態：
+ * - take 道具：玩家必須持有該道具
+ * - give 道具：玩家持有數量必須未達 max_count
+ */
+function checkItemChangesEligible(card, state) {
+    const actions = card.actions || [];
+    const player = state.players[state.currentPlayerIdx];
+    if (!player) return true;
+    const playerItems = player.items || [];
+    const itemDefs = state.items || {};
+
+    for (const action of actions) {
+        if (action.type !== 'item_changes') continue;
+        // 只檢查當前玩家（skip:0）的 action，其他目標不影響抽卡資格
+        const target = action.target || 'skip:0';
+        if (target !== 'skip:0' && target !== 'current') continue;
+
+        // take：玩家必須持有
+        if (action.take && action.take.length) {
+            if (action.take.some(item => !playerItems.includes(item))) return false;
+        }
+        // give：玩家持有數量未達 max_count
+        if (action.give && action.give.length) {
+            for (const itemName of action.give) {
+                const def = itemDefs[itemName];
+                const maxCount = def?.max_count ?? 1;
+                if (maxCount > 0) {
+                    const owned = playerItems.filter(i => i === itemName).length;
+                    if (owned >= maxCount) return false;
+                }
+            }
+        }
+    }
+    return true;
 }
