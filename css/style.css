@@ -1,0 +1,485 @@
+/* ================================================
+   全域元素基礎樣式
+   ================================================ */
+
+h2 {
+    font-weight: 700;
+    color: rgb(96, 165, 250);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    font-size: var(--text-largest-size);
+    margin: 0.5rem 0;
+}
+
+button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    transition: all 0.15s ease;
+    font-size: 1.125rem;
+    font-family: 'Noto Sans TC', sans-serif;
+    padding: 0.5rem 1rem;
+    margin-top: var(--gap-small);
+    margin-bottom: var(--gap-small);
+    height: 3rem;
+    border-radius: var(--border-radius);
+    box-sizing: border-box;
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+select, ul,
+input[type="select"],
+input[type="text"] {
+    outline: none;
+    font-weight: 700;
+    color: var(--text-primary);
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: var(--text-large-size);
+    padding: 0.5rem 1rem;
+    height: 3rem;
+    box-sizing: border-box;
+}
+
+select, 
+input[type="select"]{
+    cursor: pointer;
+}
+
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: var(--text-padding);
+    gap: var(--gap);
+    background-color: var(--navbar-color);
+    box-shadow:
+        0 10px 20px -5px var(--navbar-color),
+        0 5px 10px -5px var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+input, textarea {
+    width: 100%;
+    background-color: rgb(2, 6, 23);
+    border: 1px solid rgb(51, 65, 85);
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    color: var(--text-primary);
+    box-sizing: border-box;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: var(--text-medium-size);
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 700;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 1.125rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    box-sizing: border-box;
+    transition: all 0.15s ease;
+    height: 3rem;
+    white-space: nowrap;
+    /* outline 狀態（未勾選） */
+    color: rgb(59, 130, 246);
+    border: 1px solid rgb(59, 130, 246);
+    background: none;
+}
+
+textarea {
+    resize: vertical;
+}
+
+span, p {
+    padding: var(--text-padding);
+    font-size: var(--text-medium-size);
+    color: var(--text-primary);
+    padding: 0 var(--gap-small);
+    margin: var(--gap-small);
+}
+
+/* ================================================
+   頁面佈局
+   ================================================ */
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--background-color);
+    color: var(--text-color);
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: calc(100vh - 4rem);
+    padding-top: 1rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* ================================================
+   按鈕變體
+   ================================================ */
+
+.btn-primary-red   { color: #fff; background-color: rgb(239, 68, 68); border: 1px solid transparent; }
+.btn-primary-red:hover { background-color: rgb(185, 28, 28); }
+
+.btn-primary-blue  { color: #fff; background-color: rgb(37, 99, 235); border: 1px solid transparent; }
+.btn-primary-blue:hover { background-color: rgb(30, 64, 175); }
+
+.btn-primary-green { color: #fff; background-color: rgb(21, 128, 61); border: 1px solid transparent; }
+.btn-primary-green:hover { background-color: rgb(20, 83, 45); }
+
+.btn-primary-dark  { color: #fff; background-color: rgb(30, 41, 59); border: 1px solid transparent; }
+.btn-primary-dark:hover { background-color: rgb(71, 85, 105); }
+
+.btn-outline-red {
+    color: rgb(239, 68, 68);
+    border: 1px solid rgb(239, 68, 68);
+    padding: 0.5rem 1rem;
+    background: none;
+}
+.btn-outline-red:hover { background-color: rgb(239, 68, 68); color: #fff; }
+
+.btn-outline-blue {
+    color: rgb(59, 130, 246);
+    border: 1px solid rgb(59, 130, 246);
+    padding: 0.5rem 1rem;
+    background: none;
+}
+.btn-outline-blue:hover { background-color: rgb(59, 130, 246); color: #fff; }
+
+.btn-outline-green {
+    color: rgb(34, 197, 94);
+    border: 1px solid rgb(34, 197, 94);
+    padding: 0.5rem 1rem;
+    background: none;
+}
+.btn-outline-green:hover { background-color: rgb(34, 197, 94); color: #fff; }
+
+.btn-outline-dark {
+    color: rgb(156, 163, 175);
+    border: 1px solid rgb(156, 163, 175);
+    padding: 0.5rem 1rem;
+    background: none;
+}
+.btn-outline-dark:hover { background-color: rgb(156, 163, 175); color: #fff; }
+
+.btn-lg {
+    height: 3rem;
+    padding: 1rem 1.5rem;
+}
+
+.btn-cross {
+    color: rgb(148, 163, 184);
+    font-size: 1.875rem;
+    background: none;
+    border: none;
+    padding: 0.25rem 0.5rem;
+}
+.btn-cross:hover { color: #fff; }
+
+.btn-nav {
+    color: rgb(148, 163, 184);
+    font-weight: 700;
+    padding: 0 0.5rem 0.5rem;
+    transition: all 0.15s ease;
+    border-bottom: 2px solid transparent;
+    font-size: var(--text-large-size);
+    background: none;
+}
+.btn-nav:hover {
+    border-bottom-color: rgb(59, 130, 246);
+    color: rgb(147, 197, 253);
+}
+
+.btn-nav-active {
+    color: rgb(59, 130, 246);
+    font-weight: 700;
+    padding: 0 0.5rem 0.5rem;
+    border-bottom: 2px solid rgb(29, 78, 216);
+    font-size: calc(var(--text-large-size) + var(--gap-small));
+    background: none;
+}
+
+/* ================================================
+   輸入容器
+   ================================================ */
+
+.input-container {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-small);
+    margin: var(--gap-small);
+    width: fit-content;
+    text-wrap: nowrap;
+    font-size: var(--text-large-size);
+    color: var(--text-primary);
+}
+
+.input-container > label,
+.input-container > span,
+.input-container > p {
+    font-size: var(--text-large-size);
+    background-color: var(--border-color);
+    padding: 0.5rem 1.5rem;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+.input-container > button,
+.input-container > a,
+.input-container > select,
+.input-container > input {
+    border-radius: var(--border-radius-small);
+    margin: 0;
+}
+
+.input-container > :first-child {
+    border-top-left-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+}
+
+.input-container > :last-child {
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
+
+.input-container.full-w,
+.input-container.full-w > button,
+.input-container.full-w > select,
+.input-container.full-w > input {
+    width: 100%;
+}
+
+/* ================================================
+   Combobox（搜尋下拉）
+   ================================================ */
+
+/* 作為 input-container 子元素時，繼承 flex 伸縮與圓角規則 */
+.combobox-wrap {
+    position: relative;
+    flex: 1.5;
+    min-width: 0;
+    height: 3rem;
+    display: flex;
+    align-items: stretch;
+    border-radius: var(--border-radius-small);
+}
+
+.combobox-wrap > input {
+    width: 100%;
+    height: 100%;
+    font-size: var(--text-large-size);
+    border-radius: var(--border-radius-small);
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.combobox-wrap > .card-dropdown {
+    position: absolute;
+    height: auto;
+}
+
+/* 繼承 input-container 首尾圓角規則 */
+.input-container > .combobox-wrap:first-child > input {
+    border-top-left-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+}
+
+.input-container > .combobox-wrap:last-child > input {
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
+
+.card-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background-color: var(--primary-dark);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-medium);
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem 0;
+    z-index: 100;
+    max-height: 16rem;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.card-dropdown li {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: var(--text-medium-size);
+    transition: background-color 0.1s;
+}
+
+.card-dropdown li:hover {
+    background-color: rgba(59, 130, 246, 0.2);
+    color: rgb(96, 165, 250);
+}
+
+/* ================================================
+   列表容器
+   ================================================ */
+
+.list-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--gap);
+    overflow-y: auto;
+    max-height: 80vh;
+    padding: var(--gap);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.scale-list-container {
+    display: grid;
+    /* auto-fill 根據容器實際可用寬度決定欄數，不依賴視窗斷點 */
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    gap: var(--gap);
+    align-items: start;         /* 各格高度獨立，不互相撐高 */
+    overflow-y: auto;
+    max-height: 80vh;
+    padding: var(--gap);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.vec-list-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ================================================
+   彈出元件
+   ================================================ */
+
+.pop-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 1.5rem;
+    z-index: 20;
+    background-color: #0f172a;
+    border-radius: 1rem;
+    border: 1px solid #334155;
+}
+
+.modal-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    font-size: 1.25rem;
+    line-height: 1;
+    color: rgb(148, 163, 184);
+    background: none;
+    border: none;
+    border-radius: var(--border-radius-small);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s, background-color 0.15s;
+}
+
+.modal-close:hover {
+    color: #fff;
+    background-color: rgba(239, 68, 68, 0.2);
+}
+
+/* ================================================
+   切換按鈕 (input[type=checkbox])
+   基礎樣式已在全域 input[type="checkbox"] 定義
+   class: input-check-[color]，未指定時等同 input-check-blue
+   ================================================ */
+
+/* blue（預設，未指定 class 時也套用） */
+input[type="checkbox"].input-check-blue::before,
+input[type="checkbox"]:not([class*="input-check"])::before { content: attr(data-label-off); }
+
+input[type="checkbox"].input-check-blue,
+input[type="checkbox"]:not([class*="input-check"]) {
+    color: rgb(59, 130, 246);
+    border-color: rgb(59, 130, 246);
+}
+input[type="checkbox"].input-check-blue:checked,
+input[type="checkbox"]:not([class*="input-check"]):checked {
+    color: #fff;
+    background-color: rgb(37, 99, 235);
+    border-color: rgb(37, 99, 235);
+}
+input[type="checkbox"].input-check-blue:checked::before,
+input[type="checkbox"]:not([class*="input-check"]):checked::before { content: attr(data-label-on); }
+
+/* green */
+input[type="checkbox"].input-check-green { color: rgb(34, 197, 94); border-color: rgb(34, 197, 94); }
+input[type="checkbox"].input-check-green::before { content: attr(data-label-off); }
+input[type="checkbox"].input-check-green:checked { color: #fff; background-color: rgb(21, 128, 61); border-color: rgb(21, 128, 61); }
+input[type="checkbox"].input-check-green:checked::before { content: attr(data-label-on); }
+
+/* red */
+input[type="checkbox"].input-check-red { color: rgb(239, 68, 68); border-color: rgb(239, 68, 68); }
+input[type="checkbox"].input-check-red::before { content: attr(data-label-off); }
+input[type="checkbox"].input-check-red:checked { color: #fff; background-color: rgb(185, 28, 28); border-color: rgb(185, 28, 28); }
+input[type="checkbox"].input-check-red:checked::before { content: attr(data-label-on); }
+
+/* dark */
+input[type="checkbox"].input-check-dark { color: rgb(148, 163, 184); border-color: rgb(148, 163, 184); }
+input[type="checkbox"].input-check-dark::before { content: attr(data-label-off); }
+input[type="checkbox"].input-check-dark:checked { color: #fff; background-color: rgb(30, 41, 59); border-color: rgb(30, 41, 59); }
+input[type="checkbox"].input-check-dark:checked::before { content: attr(data-label-on); }
+
+
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+    user-select: none;
+}
+
+div.disabled {
+    filter: blur(2px);
+}
+
+.hidden { display: none !important; }
+.fade-out { opacity: 0; pointer-events: none; }

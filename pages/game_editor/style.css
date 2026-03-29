@@ -1,0 +1,34 @@
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    overflow: hidden;
+    padding-top: 0;
+    padding: var(--gap);
+    gap: var(--gap);
+    overflow-y: auto;
+    max-width: 48rem;
+    margin: 0 auto;
+}
+
+/* 基本資訊 */
+#input-rules {
+    min-height: 15rem;
+}
+
+.input-container.role-row,
+.input-container.role-row > input[type="text"] {
+    width: 100%;
+}
+
+.input-container.role-row > button {
+    width: 3rem;
+}
+
+.input-container.role-row > input[type="number"] {
+    width: 5rem;
+    text-align: center;
+}
+/* 提示文字 */
+.hint-ok  { color: rgb(34, 197, 94);  font-size: var(--text-small-size); padding: 0; margin: 0; }
+.hint-err { color: rgb(239, 68, 68);  font-size: var(--text-small-size); padding: 0; margin: 0; }

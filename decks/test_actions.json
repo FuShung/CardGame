@@ -1,0 +1,291 @@
+{
+  "title": "效果測試",
+  "rules": "用於測試所有卡牌效果邏輯。\n建議設定 3 位玩家並指定身分（主、副、觀察者）後開始。\n預設抽卡模式：輪流玩家。",
+  "player_draw_mode": 1,
+  "roles": [
+    { "name": "主" },
+    { "name": "副" },
+    { "name": "觀察者" }
+  ],
+  "cards": [
+    {
+      "name": "【積分】當前+1",
+      "rarity": 1,
+      "effect": "當前玩家積分 +1",
+      "actions": [{ "type": "score", "on": "always", "target": "skip:0", "expr": "+1" }]
+    },
+    {
+      "name": "【積分】當前-1",
+      "rarity": 1,
+      "effect": "當前玩家積分 -1",
+      "actions": [{ "type": "score", "on": "always", "target": "skip:0", "expr": "-1" }]
+    },
+    {
+      "name": "【積分】下一位+2",
+      "rarity": 1,
+      "effect": "下一位玩家積分 +2",
+      "actions": [{ "type": "score", "on": "always", "target": "skip:1", "expr": "+2" }]
+    },
+    {
+      "name": "【積分】上一位-2",
+      "rarity": 1,
+      "effect": "上一位玩家積分 -2",
+      "actions": [{ "type": "score", "on": "always", "target": "skip:-1", "expr": "-2" }]
+    },
+    {
+      "name": "【積分】身分主+3",
+      "rarity": 2,
+      "effect": "身分「主」積分 +3",
+      "actions": [{ "type": "score", "on": "always", "target": "role:主", "expr": "+3" }]
+    },
+    {
+      "name": "【積分】隨機1~5",
+      "rarity": 2,
+      "effect": "當前玩家積分隨機 +1~5",
+      "actions": [{ "type": "score", "on": "always", "target": "skip:0", "expr": "+1~5" }]
+    },
+    {
+      "name": "【積分】歸零",
+      "rarity": 2,
+      "effect": "當前玩家積分歸零",
+      "actions": [{ "type": "score", "on": "always", "target": "skip:0", "expr": "=0" }]
+    },
+    {
+      "name": "【挑戰】成功+2 失敗-1",
+      "rarity": 3,
+      "effect": "挑戰：成功 +2，失敗 -1",
+      "is_challenge": true,
+      "actions": [
+        { "type": "score", "on": "success", "target": "skip:0", "expr": "+2" },
+        { "type": "score", "on": "fail",    "target": "skip:0", "expr": "-1" }
+      ]
+    },
+    {
+      "name": "【挑戰】成功下一位-1 失敗-2",
+      "rarity": 3,
+      "effect": "挑戰：成功則下一位 -1，失敗則自己 -2",
+      "is_challenge": true,
+      "actions": [
+        { "type": "score", "on": "success", "target": "skip:1",  "expr": "-1" },
+        { "type": "score", "on": "fail",    "target": "skip:0", "expr": "-2" }
+      ]
+    },
+    {
+      "name": "【身分交換】當前↔下一位",
+      "rarity": 3,
+      "effect": "當前玩家與下一位交換身分",
+      "actions": [{ "type": "swap_roles", "on": "always", "target_a": "skip:0", "target_b": "skip:1" }]
+    },
+    {
+      "name": "【身分交換】主↔副",
+      "rarity": 3,
+      "effect": "身分「主」與「副」互換",
+      "actions": [{ "type": "swap_roles", "on": "always", "target_a": "role:主", "target_b": "role:副" }]
+    },
+    {
+      "name": "【挑戰】成功換身分",
+      "rarity": 4,
+      "effect": "挑戰：成功則當前↔下一位換身分",
+      "is_challenge": true,
+      "actions": [{ "type": "swap_roles", "on": "success", "target_a": "skip:0", "target_b": "skip:1" }]
+    },
+    {
+      "name": "【抽卡模式】隨機玩家",
+      "rarity": 2,
+      "effect": "抽卡模式改為隨機玩家",
+      "actions": [{ "type": "change_draw_mode", "on": "always", "mode": 0 }]
+    },
+    {
+      "name": "【抽卡模式】輪流玩家",
+      "rarity": 2,
+      "effect": "抽卡模式改為輪流玩家",
+      "actions": [{ "type": "change_draw_mode", "on": "always", "mode": 1 }]
+    },
+    {
+      "name": "【抽卡模式】隨機身分（主）",
+      "rarity": 3,
+      "effect": "抽卡模式改為隨機身分，指定「主」",
+      "actions": [{ "type": "change_draw_mode", "on": "always", "mode": 2, "role": "主" }]
+    },
+    {
+      "name": "【抽卡模式】輪流身分（主）",
+      "rarity": 3,
+      "effect": "抽卡模式改為輪流身分，指定「主」",
+      "actions": [{ "type": "change_draw_mode", "on": "always", "mode": 3, "role": "主" }]
+    },
+    {
+      "name": "【指定抽卡】下一位",
+      "rarity": 2,
+      "effect": "下一位玩家抽卡（一次）",
+      "actions": [{ "type": "change_draw_player", "on": "always", "target": "skip:1" }]
+    },
+    {
+      "name": "【指定抽卡】上一位",
+      "rarity": 2,
+      "effect": "上一位玩家抽卡（一次）",
+      "actions": [{ "type": "change_draw_player", "on": "always", "target": "skip:-1" }]
+    },
+    {
+      "name": "【指定抽卡】當前再抽一次",
+      "rarity": 2,
+      "effect": "當前玩家再抽一次",
+      "actions": [{ "type": "change_draw_player", "on": "always", "target": "current" }]
+    },
+    {
+      "name": "【指定抽卡】跳過下一位",
+      "rarity": 2,
+      "effect": "跳過下一位，由下下位玩家抽卡",
+      "actions": [{ "type": "change_draw_player", "on": "always", "target": "skip:2" }]
+    },
+    {
+      "name": "【指定抽卡】身分主",
+      "rarity": 3,
+      "effect": "身分「主」的玩家抽卡（一次）",
+      "actions": [{ "type": "change_draw_player", "on": "always", "target": "role:主" }]
+    },
+    {
+      "name": "【挑戰】成功指定下一位抽卡",
+      "rarity": 4,
+      "effect": "挑戰：成功則下一位抽卡",
+      "is_challenge": true,
+      "actions": [{ "type": "change_draw_player", "on": "success", "target": "skip:1" }]
+    },
+    {
+      "name": "【複合】積分+指定下一位",
+      "rarity": 4,
+      "effect": "當前 +1，並由下一位抽卡",
+      "actions": [
+        { "type": "score",              "on": "always", "target": "skip:0", "expr": "+1" },
+        { "type": "change_draw_player", "on": "always", "target": "skip:1" }
+      ]
+    },
+    {
+      "name": "【複合】挑戰：換身分+積分",
+      "rarity": 5,
+      "effect": "挑戰：成功則當前↔下一位換身分且各+2，失敗則當前 -3",
+      "is_challenge": true,
+      "actions": [
+        { "type": "swap_roles", "on": "success", "target_a": "skip:0", "target_b": "skip:1" },
+        { "type": "score",      "on": "success", "target": "skip:0",   "expr": "+2" },
+        { "type": "score",      "on": "success", "target": "skip:1",   "expr": "+2" },
+        { "type": "score",      "on": "fail",    "target": "skip:0",   "expr": "-3" }
+      ]
+    },
+    {
+      "name": "【切換牌組】→積分測試",
+      "rarity": 2,
+      "effect": "切換到「積分測試」牌組",
+      "actions": [{ "type": "change_deck", "on": "always", "target": "積分測試" }]
+    },
+    {
+      "name": "【切換牌組】→挑戰測試",
+      "rarity": 2,
+      "effect": "切換到「挑戰測試」牌組",
+      "actions": [{ "type": "change_deck", "on": "always", "target": "挑戰測試" }]
+    },
+    {
+      "name": "【切換牌組】→抽卡邏輯測試",
+      "rarity": 2,
+      "effect": "切換到「抽卡邏輯測試」牌組",
+      "actions": [{ "type": "change_deck", "on": "always", "target": "抽卡邏輯測試" }]
+    },
+    {
+      "name": "【切換牌組】挑戰成功換組",
+      "rarity": 4,
+      "effect": "挑戰：成功則切換到「挑戰測試」並當前 +2",
+      "is_challenge": true,
+      "actions": [
+        { "type": "change_deck", "on": "success", "target": "挑戰測試" },
+        { "type": "score",       "on": "success", "target": "current", "expr": "+2" }
+      ]
+    }
+  ],
+  "decks": [
+    {
+      "name": "全效果測試",
+      "draw_mode": 1,
+      "visible": true,
+      "pool": [
+        "【積分】當前+1",
+        "【積分】當前+1",
+        "【積分】當前+1",
+        "【積分】當前-1",
+        "【積分】下一位+2",
+        "【積分】上一位-2",
+        "【積分】身分主+3",
+        "【積分】隨機1~5",
+        "【積分】歸零",
+        "【挑戰】成功+2 失敗-1",
+        "【挑戰】成功+2 失敗-1",
+        "【挑戰】成功下一位-1 失敗-2",
+        "【身分交換】當前↔下一位",
+        "【身分交換】主↔副",
+        "【挑戰】成功換身分",
+        "【指定抽卡】下一位",
+        "【指定抽卡】上一位",
+        "【指定抽卡】當前再抽一次",
+        "【指定抽卡】跳過下一位",
+        "【指定抽卡】身分主",
+        "【挑戰】成功指定下一位抽卡",
+        "【複合】積分+指定下一位",
+        "【複合】挑戰：換身分+積分",
+        "【抽卡模式】隨機玩家",
+        "【抽卡模式】輪流玩家"
+      ]
+    },
+    {
+      "name": "積分測試",
+      "draw_mode": 1,
+      "visible": true,
+      "pool": [
+        "【積分】當前+1",
+        "【積分】當前-1",
+        "【積分】下一位+2",
+        "【積分】上一位-2",
+        "【積分】身分主+3",
+        "【積分】隨機1~5",
+        "【積分】歸零"
+      ]
+    },
+    {
+      "name": "挑戰測試",
+      "draw_mode": 1,
+      "visible": true,
+      "pool": [
+        "【挑戰】成功+2 失敗-1",
+        "【挑戰】成功下一位-1 失敗-2",
+        "【挑戰】成功換身分",
+        "【挑戰】成功指定下一位抽卡",
+        "【複合】挑戰：換身分+積分"
+      ]
+    },
+    {
+      "name": "抽卡邏輯測試",
+      "draw_mode": 1,
+      "visible": true,
+      "pool": [
+        "【抽卡模式】隨機玩家",
+        "【抽卡模式】輪流玩家",
+        "【抽卡模式】隨機身分（主）",
+        "【抽卡模式】輪流身分（主）",
+        "【指定抽卡】下一位",
+        "【指定抽卡】上一位",
+        "【指定抽卡】當前再抽一次",
+        "【指定抽卡】跳過下一位",
+        "【指定抽卡】身分主",
+        "【複合】積分+指定下一位"
+      ]
+    },
+    {
+      "name": "牌組切換測試",
+      "draw_mode": 1,
+      "visible": true,
+      "pool": [
+        "【切換牌組】→積分測試",
+        "【切換牌組】→挑戰測試",
+        "【切換牌組】→抽卡邏輯測試",
+        "【切換牌組】挑戰成功換組"
+      ]
+    }
+  ]
+}

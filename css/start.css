@@ -1,0 +1,29 @@
+.star {
+    cursor: pointer;
+    color: silver;
+    font-size: 1.5rem;
+}
+
+.star:hover {
+    cursor: pointer;
+    color: dodgerblue;
+}
+
+.star.active {
+    cursor: pointer;
+    color: goldenrod;
+}
+
+.star.active:hover {
+    cursor: pointer;
+    color: dodgerblue;
+}
+
+/* 評分編輯器主容器 */
+.star-editor {
+    display: inline-flex;
+    flex-direction: row; /* 關鍵：反向排列以便使用 ~ 選擇器 */
+    justify-content: center;
+    width: 100%;
+    gap: 5px;
+}

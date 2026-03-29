@@ -1,0 +1,54 @@
+/* --- 分隔線 --- */
+.glass-divider {
+  height: 1px;
+  background-color: var(--border-color);
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+/* --- 玻璃卡片 --- */
+.glass-card {
+  /* 基礎版型與間距 */
+  width: 100%;
+  max-width: 50rem;
+  padding: var(--gap);
+  margin: var(--gap);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  /* 背景與磨砂玻璃效果 (backdrop-blur) */
+  background-color: rgba(30, 41, 59, 0.4);
+  backdrop-filter: blur(12px); 
+  -webkit-backdrop-filter: blur(12px); 
+
+  /* 圓角與邊框 */
+  border-radius: 1rem; 
+  border: 1px solid rgb(51, 65, 85);
+
+  /* 陰影 */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+              0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* --- 玻璃卡片標題 --- */
+.glass-card-header {
+  font-size: 1rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* --- 玻璃卡片內容 --- */
+.glass-card-content {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* --- 與玻璃卡片等寬的按鈕 --- */
+.btn-glass-size {
+  width: 100%;
+  max-width: 50rem;
+  margin: 1rem auto;
+}

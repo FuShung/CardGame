@@ -1,0 +1,49 @@
+:root {
+    /* 主要顏色 */
+    --light-green: rgb(34, 197, 94);
+    --primary-blue: rgb(37, 99, 235);
+    --primary-green: rgb(21, 128, 61);
+    --primary-red: rgb(239, 68, 68);
+    --primary-dark: rgb(30, 41, 59);
+    --primary-gray: rgb(71, 85, 105);
+
+    /* 光暈 */
+    --shadow-size: 0 0 15px;
+    --primary-blue-shadow: rgba(37, 99, 235, 0.5);
+    --primary-green-shadow: rgba(21, 128, 61, 0.5);
+    --primary-red-shadow: rgba(239, 68, 68, 0.5);
+    --primary-dark-shadow: rgba(30, 41, 59, 0.5);
+    --primary-gray-shadow: rgba(71, 85, 105, 0.5);
+
+    /* 主背景：極深藍色，接近黑但帶有冷調 */
+    --background-color: rgb(15, 23, 42); 
+    --border-color: rgb(51, 65, 85);     
+    --navbar-color: rgb(15, 23, 42);
+
+    /* 文字層級：確保閱讀舒適度 */
+    --text-primary: rgb(248, 250, 252);  /* 主要文字（近白） */
+    --text-secondary: rgb(148, 163, 184); /* 次要/說明文字（灰藍） */
+    --text-disabled: rgb(71, 85, 105);   /* 已停用文字 */
+
+    /* 互動與狀態：明亮的標誌藍 */
+    --action-color: rgb(59, 130, 246);    /* 按鈕主色 */
+    --action-hover: rgb(96, 165, 250);    /* 滑鼠懸停色 */
+    --action-active: rgb(37, 99, 235);   /* 點擊瞬間色 */
+
+    /* 定義文字大小 */
+    --text-largest-size: 2rem;
+    --text-large-size: 1.25rem;
+    --text-medium-size: 1rem;
+    --text-small-size: 0.875rem;
+    --text-padding: 0.5rem;
+
+    /* 定義圓角大小 */
+    --border-radius-small: 0.25rem;
+    --border-radius-medium: 0.5rem;
+    --border-radius: 0.75rem;
+
+    /* Gap */
+    --gap-small: 0.25rem;
+    --gap-medium: 0.5rem;
+    --gap: 1rem;
+}

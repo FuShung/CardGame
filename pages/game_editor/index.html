@@ -1,0 +1,32 @@
+<!-- 基本資訊 -->
+<div class="input-container full-w">
+    <span>標題</span>
+    <input id="input-title" type="text" placeholder="遊戲標題">
+</div>
+<div class="input-container full-w">
+    <span>規則</span>
+    <textarea id="input-rules" placeholder="遊戲規則說明"></textarea>
+</div>
+
+<div class="input-container full-w">
+    <span>抽卡模式</span>
+    <select id="select-drawer-mode">
+        <option value="0">隨機玩家</option>
+        <option value="1">玩家輪流</option>
+        <option value="2">指定身分隨機</option>
+        <option value="3">指定身分輪流</option>
+    </select>
+    <select id="select-drawer-role" class="hidden"></select>
+    <span>身分清單</span>
+    <button id="btn-add-role" class="btn-outline-green">＋ 新增身分</button>
+</div>
+<div id="role-list"></div>
+
+<!-- 操作按鈕 -->
+<div class="input-container full-w">
+    <button id="btn-save" class="btn-lg btn-primary-green">儲存</button>
+    <button id="btn-export" class="btn-lg btn-primary-dark">匯出</button>
+    <button id="btn-import" class="btn-lg btn-primary-dark">匯入</button>
+</div>
+
+<input type="file" id="import-input" class="hidden" accept=".json">

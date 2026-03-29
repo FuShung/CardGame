@@ -1,0 +1,250 @@
+/* #region --- 牌組列表 --- */
+
+#deck-list {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    padding: var(--gap) 2rem;
+    gap: var(--gap);
+    max-height: 90vh;
+    
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    align-items: start;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+
+.deck-item {
+    opacity: 0.5;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-small);
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.deck-item:hover {
+    border-color: var(--primary-gray);
+    box-shadow: var(--shadow-size) var(--primary-gray-shadow);
+}
+
+.deck-item.deck-visible {
+    opacity: 1;
+}
+
+.deck-item.deck-visible:hover {
+    border-color: var(--primary-blue);
+    box-shadow: var(--shadow-size) var(--primary-blue-shadow);
+}
+
+.deck-header {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.deck-header > .glass-card-header {
+    cursor: pointer;
+    flex-grow: 1;
+    min-width: 0; /* 讓 flex 子元素可以縮小 */
+    font-size: var(--text-large-size);
+    text-align: center;
+    padding-right: 0;
+    padding-left: 0;
+    margin-right: var(--gap);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.deck-item.deck-visible .glass-card-header {
+    color: var(--light-green);
+}
+
+.deck-header > .glass-card-content {
+    padding-right: 0px;
+    padding-left: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    font-size: var(--text-medium-size);
+    text-align: right;
+    text-wrap: nowrap;
+    display: flex;
+    align-items: center;      /* 關鍵：垂直置中 */
+    justify-content: flex-end;
+    height: 100%;
+}
+
+.deck-item > .input-container,
+.deck-item > .input-container > button {
+    width: 100%;
+}
+/* #endregion */
+
+/* #region --- 彈跳視窗布局 --- */
+#decks-editor-modal {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    min-width: 50rem;
+    max-width: 100vw;
+    /* 固定高度上限，讓內部 overflow 生效 */
+    max-height: 85vh;
+    height: 85vh;
+}
+
+#decks-editor-modal > .input-container,
+#decks-editor-modal > .input-container > button {
+    width: 100%;
+}
+
+#decks-editor-modal > .table {
+    display: flex;
+    flex-direction: row;
+    /* flex: 1 + min-height: 0 是讓子元素 overflow 生效的關鍵 */
+    flex: 1 1 0;
+    min-height: 0;
+}
+
+.table > .column {
+    padding-left: var(--gap);
+    padding-right: var(--gap);
+    border-left: 1px solid var(--border-color);
+}
+
+/* 左欄：固定寬度 */
+.table > .column-left {
+    flex: 0 0 20rem;
+    width: 20rem;
+    min-width: 0;
+    min-height: 0;
+    padding-left: 0;
+    border-left: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-small);
+}
+
+/* 右欄：佔據剩餘空間，同樣建立高度約束 */
+.table > .column-right {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+    padding-left: var(--gap);
+    padding-right: 0;
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-small);
+}
+/* #endregion */
+
+/* #region --- 編輯器牌池列表 --- */
+
+.column-left > .input-container {
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.column-left > .input-container > button,
+.column-left > .input-container > select {
+    width: 100%;
+}
+
+/* 左欄可選卡牌區塊：可捲動 */
+#editor-add-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-small);
+    flex: 1;
+    overflow-y: auto;
+    padding-right: var(--gap-small);
+}
+
+/* 左欄可選項目按鈕：限制寬度，文字截斷 */
+.editor-source-btn {
+    width: 90%;
+    text-align: left;
+    justify-content: flex-start;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-height: 2rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 右欄牌池列表：可捲動，高度由父層 column-right 約束 */
+#editor-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-small);
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: var(--gap-small);
+}
+
+/* 牌池中每一列 */
+.editor-pool-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-small);
+    padding: var(--gap-small) var(--gap-medium);
+    background-color: rgba(30, 41, 59, 0.6);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-medium);
+}
+
+.editor-pool-name {
+    flex: 1;
+    font-size: var(--text-medium-size);
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 右側操作按鈕群：align-items stretch 讓按鈕高度跟隨 input */
+.editor-pool-controls {
+    display: flex;
+    align-items: stretch;
+    gap: var(--gap-small);
+    flex-shrink: 0;
+}
+
+.editor-pool-controls > button {
+    padding: 0.25rem 1rem;
+}
+
+/* 數量輸入框：固定寬度避免按鈕位移 */
+.editor-pool-count {
+    width: 5rem;
+    text-align: center;
+    font-size: var(--text-small-size);
+    color: var(--text-primary);
+    flex-shrink: 0;
+    /* 隱藏 number input 的上下箭頭 */
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+.editor-pool-count::-webkit-outer-spin-button,
+.editor-pool-count::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+/* 右欄標題文字 */
+#editor-mode-title {
+    font-size: var(--text-small-size);
+    color: var(--text-secondary);
+}
+
+#editor-total-count {
+    font-size: var(--text-small-size);
+    color: var(--action-color);
+    font-family: monospace;
+}
+/* #endregion */

@@ -1,0 +1,166 @@
+/* #region --- 編輯區排版 --- */
+.editor-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--gap);
+    max-width: 60rem;
+}
+
+.editor-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gap-small);
+    padding-bottom: var(--gap);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.editor-header h2 {
+    margin: 0;
+    font-size: var(--text-large-size);
+    color: var(--text-primary);
+}
+
+.editor-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+}
+
+.editor-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-small);
+}
+
+.editor-field > label:first-child {
+    font-size: var(--text-small-size);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.editor-field > select,
+.editor-field > textarea {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.editor-field-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--gap-small);
+}
+
+.editor-field-header > label {
+    font-size: var(--text-small-size);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* #endregion */
+/* #endregion */
+
+/* #region --- 彈跳視窗 --- */
+#card-editor-modal {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    min-width: 40rem;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+#card-editor-modal > .input-container,
+#card-editor-modal > .input-container > button {
+    width: 100%;
+}
+
+#edit-card-effect {
+    min-height: 8rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#score-changes-list,
+#score-changes-success,
+#score-changes-fail {
+    max-height: 30vh;
+    overflow-y: auto;
+    margin-bottom: var(--gap-small);
+}
+
+.score-label-success { color: rgb(34, 197, 94); }
+.score-label-fail    { color: rgb(239, 68, 68); }
+
+/* #endregion */
+/* #region --- 卡牌列表 --- */
+#card-prototype-list {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    padding: var(--gap) 2rem;
+    gap: var(--gap);
+    max-height: 80vh;
+    
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    align-items: start;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+#card-prototype-list > .glass-card {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 5rem;
+    gap: var(--gap-small);
+    margin: 0;
+    border-radius: var(--border-radius-medium);
+    box-sizing: border-box;
+}
+
+#card-prototype-list > .glass-card > .input-container,
+#card-prototype-list > .glass-card > .input-container > button {
+    width: 10rem;
+}
+
+.card-info {
+    width: 100%;
+    min-width: 0; /* 讓 flex 子元素可以縮小，text-overflow 才會生效 */
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+}
+
+.card-info > p {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.card-info > .star.active {
+    pointer-events: none;
+    font-size: var(--text-small-size);
+}
+/* #endregion */
+
+/* #region --- 效果列表 --- */
+#btn-add-action {
+    flex-shrink: 0;
+    width: auto;
+}
+
+#actions-list .input-container > button:last-child {
+    width: 3rem;
+    min-width: 3rem;
+    flex-shrink: 0;
+    padding: 0;
+}
+/* #endregion */

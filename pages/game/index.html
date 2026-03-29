@@ -1,0 +1,111 @@
+<!-- 玩家設定畫面 -->
+<div id="setup-panel">
+    <h2 class="title"></h2>
+    <div id="setup-player-list"></div>
+    <div id="setup-footer">
+        <button id="btn-add-player" class="btn-outline-blue">＋ 新增玩家</button>
+        <button id="btn-start-game" class="btn-lg btn-primary-green">開始遊戲</button>
+    </div>
+</div>
+
+<!-- 主要內容區 -->
+<div id="game-main" class="hidden">
+
+    <!-- 資訊面板 -->
+    <h2 class="title"></h2>
+    <div id="deck-info-box" class="glass-card">
+        <div class="deck-info-row">
+            <div>
+                <p class="glass-card-header">目前牌組</p>
+                <p id="lb-deck-name" class="glass-card-content">載入中...</p>
+            </div>
+            <div>
+                <p class="glass-card-header">剩餘張數</p>
+                <p id="lb-deck-remaining" class="glass-card-content">0</p>
+            </div>
+            <div>
+                <p class="glass-card-header">抽卡模式</p>
+                <p id="lb-draw-mode" class="glass-card-content">—</p>
+            </div>
+        </div>
+        <div class="deck-info-row">
+            <div>
+                <p class="glass-card-header">本輪抽卡</p>
+                <p id="lb-current-player" class="glass-card-content">—</p>
+            </div>
+            <div>
+                <p class="glass-card-header">下一輪抽卡</p>
+                <p id="lb-next-player" class="glass-card-content">—</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 卡牌面板 -->
+    <div id="card-display-box">
+        <div id="card-back">
+            <div id="empty-card-mark">?</div>
+            <div id="empty-card-label">點擊抽取卡片</div>
+        </div>
+
+        <div id="card-front" class="glass-card hidden">
+            <h2 id="card-name-text"></h2>
+            <h2 id="card-rarity-badge">★★★★★</h2>
+            <div class="glass-divider"></div>
+            <div id="card-effect-text" class="glass-card-content"></div>
+            <div id="card-score-changes"></div>
+            <div id="timer-ui">
+                <div id="timer-running-box" class="hidden">
+                    <div class="timer-header">
+                        <span id="timer-clock" class="active">00:00</span>
+                    </div>
+                    <div class="progress-container">
+                        <div id="timer-bar"></div>
+                    </div>
+                </div>
+                <button id="start-timer-btn" class="btn-lg btn-primary-red">
+                    ⏱️ 開始計時
+                </button>
+            </div>
+            <div id="challenge-ui" class="hidden">
+                <div class="glass-divider"></div>
+                <div id="challenge-buttons">
+                    <button id="btn-challenge-success" class="btn-lg btn-primary-green">✓ 成功</button>
+                    <button id="btn-challenge-fail" class="btn-lg btn-primary-red">✕ 失敗</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 抽卡按鈕 -->
+    <div id="game-footer"></div>
+
+</div>
+
+
+<!-- 側欄按鈕列 -->
+<div id="sidebar-tabs">
+    <button class="sidebar-tab-btn" data-panel="rules-panel" title="規則說明">📋</button>
+    <button class="sidebar-tab-btn" data-panel="decks-panel" title="牌組">🃏</button>
+    <button class="sidebar-tab-btn" data-panel="players-panel" title="玩家">👥</button>
+</div>
+
+<!-- 側欄面板（滑入，佔滿整個側邊） -->
+<div id="sidebar-panel">
+    <div id="rules-panel" class="sidebar-content hidden">
+        <h2>規則說明</h2>
+        <div class="glass-divider"></div>
+        <div id="rules-label" class="glass-card-content"></div>
+    </div>
+    <div id="decks-panel" class="sidebar-content hidden">
+        <h2>牌組</h2>
+        <div class="glass-divider"></div>
+        <div id="sidebar-deck-list"></div>
+    </div>
+    <div id="players-panel" class="sidebar-content hidden">
+        <h2>玩家</h2>
+        <div class="glass-divider"></div>
+        <div id="sidebar-player-list"></div>
+        <button id="btn-clear-scores" class="btn-outline-dark" style="margin-top:auto;">🗑 清除所有積分</button>
+        <button id="btn-restart-game" class="btn-outline-red">↺ 重新開始遊戲</button>
+    </div>
+</div>

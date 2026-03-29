@@ -1,0 +1,46 @@
+<!-- 按鈕工具 -->
+<div id="btn-group" class="input-container">
+    <span>選擇</span>
+    <input id="input-deck-name" type="text" placeholder="牌組名稱">
+    <button id="btn-edit-deck" class="btn-lg btn-primary-green disabled">新增</button>
+    <button id="btn-delete-deck" class="btn-lg btn-primary-red disabled">刪除</button>
+</div>
+
+<!-- 牌組列表 -->
+<div id="deck-list" class="scale-list-container">
+
+</div>
+
+<!-- 牌組編輯器 -->
+<div id="decks-editor-modal" class="pop-modal">
+    <button class="modal-close" aria-label="關閉">✕</button>
+    <h2 id="edit-deck-name">牌組</h2>
+    <div class="table">
+        <div class="column column-left">
+            <div class="input-container">
+                <span>編輯模式</span>
+                <select id="edit-deck-mode">
+                    <option value="0">隨機模式</option>
+                    <option value="1">重抽模式</option>
+                    <option value="2">順序模式</option>
+                </select>
+            </div>
+            <!-- 分頁切換：卡牌 / 牌組 -->
+            <div class="input-container" id="editor-source-tabs">
+                <button id="tab-cards" class="btn-primary-blue">卡牌</button>
+                <button id="tab-decks" class="btn-outline-blue">牌組</button>
+            </div>
+            <div id="editor-add-buttons"></div>
+        </div>
+        <div class="column column-right">
+            <span id="editor-mode-title">---</span>
+            <span id="editor-total-count">0 Cards</span>
+            <div id="editor-list-container"></div>
+        </div>
+    </div>
+    <br />
+    <div class="input-container">
+        <button id="btn-save-edit" class="btn-lg btn-primary-green">儲存</button>
+        <button id="btn-cancel-edit" class="btn-lg btn-primary-dark">取消</button>
+    </div>
+</div>

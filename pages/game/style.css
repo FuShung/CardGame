@@ -1,0 +1,471 @@
+/* #region 玩家設定畫面 */
+#setup-panel {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--gap);
+    gap: var(--gap);
+    overflow-y: auto;
+    max-width: 32rem;
+    width: 100%;
+    margin: 0 auto;
+}
+
+#setup-player-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-small);
+    width: 100%;
+}
+
+.setup-player-row {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-small);
+    width: 100%;
+}
+
+.setup-player-row input[type="text"] {
+    flex: 1;
+}
+
+#setup-footer {
+    display: flex;
+    gap: var(--gap-small);
+    width: 100%;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-bottom: var(--gap);
+}
+/* #endregion */
+
+/* #region 資訊面板 */
+#deck-info-box {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--gap-small);
+    margin-bottom: 1rem;
+}
+
+.deck-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    gap: var(--gap);
+}
+
+.deck-info-row > div {
+    flex: 1;
+    min-width: 0;
+}
+
+.deck-info-row > div > .glass-card-content {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* #endregion */
+
+/* #region 卡牌面板 */
+
+/* 假設 animate-pop 的關鍵影格設定 */
+@keyframes pop {
+    0% { transform: scale(0.95); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* #region 初始樣式 */
+#card-back {
+    width: auto;
+    min-width: 15rem;
+    min-height: 20rem;
+    /* 背景與邊框 */
+    background-color: #1e293b; /* bg-slate-800 */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border-radius: 1rem;       /* rounded-2xl */
+    border: 4px solid #334155; /* border-4 border-slate-700 */
+    
+    margin: auto;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+
+    /* 自定義動畫 */
+    animation: pop 0.3s ease-out; 
+}
+
+#empty-card-mark {
+    width: 6rem;
+    height: 6rem;
+    background-color: #334155;
+    border-radius:50%; 
+    border-width: 4px; 
+    border-color: #475569;
+    border-style: solid;
+    font-size: 3rem;
+    color: #94a3b8;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+}
+
+#empty-card-label {
+    color: #94a3b8;
+    font-weight: 500;
+    font-size: 1.5rem;
+    font-style: italic;
+
+    margin-top: auto;
+    margin-bottom: 1rem;
+}
+/* #endregion */
+
+/* #region 卡牌樣式 */
+#card-front {
+    margin: auto;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    min-width: 20rem;
+    max-width: 100%;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    min-height: 40vh;
+
+    /* 自定義動畫 */
+    animation: pop 0.3s ease-out; 
+}
+
+#card-rarity-badge {
+    color: goldenrod;
+}
+#card-effect-text {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    align-items: center;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+#card-effect-text > p {
+    text-align: left;
+    margin-left: 1rem;
+    margin-right: auto;
+    justify-content: center;
+}
+
+#card-effect-text > :first-child {
+    margin-top: auto;
+}
+
+#card-effect-text > :last-child {
+    margin-bottom: auto;
+}
+
+/* --- 卡牌光暈效果 --- */
+.card-glow-5 { box-shadow: 0 0 25px #fbbf24; border: 2px solid #fbbf24; }
+.card-glow-4 { box-shadow: 0 0 15px #e879f9; border: 2px solid #e879f9; }
+.card-glow-3 { box-shadow: 0 0 10px #60a5fa; border: 2px solid #60a5fa; }
+.card-glow-2 { box-shadow: 0 0 8px #4ade80; border: 2px solid #4ade80; }
+.card-glow-1 { box-shadow: 0 0 5px #94a3b8; border: 2px solid #94a3b8; }
+/* #endregion */
+
+/* #region 計時器 */
+#timer-ui {
+    width: 100%;
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    margin-top: auto; 
+    margin-bottom: 0rem;
+}
+
+#timer-ui #confirm-timer-btn {
+    margin-top: auto;
+    margin-bottom: 0.5rem;
+}
+
+/* 父容器佈局 */
+#timer-running-box {
+    flex-direction: column;
+    width: 100%;
+
+}
+
+/* 上方文字資訊欄 (原本的 flex justify-between items-end) */
+.timer-header {
+    display: flex;
+    justify-content: space-between; /* 左右對齊 */
+    align-items: flex-end;          /* 底部對齊 */
+    margin-bottom: 0.5rem;          /* mb-2 (8px) */
+}
+
+/* 右側倒數時鐘 */
+#timer-clock {
+    font-size: 1.5rem;              /* text-2xl */
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; /* font-mono */
+    font-weight: bold;
+    color: #94a3b8;                 /* text-slate-400 */
+    letter-spacing: 0.05em;         /* tracking-wide */
+}
+
+#timer-clock.active {
+    color: #ef4444;                 /* text-red-500 */
+    letter-spacing: 0.1em;          /* tracking-widest */
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; /* animate-pulse */
+
+}
+
+/* 進度條容器 */
+.progress-container {
+    width: 100%;
+    background-color: #1e293b;      /* bg-slate-800 */
+    height: 0.5rem;                 /* h-2 (8px) */
+    border-radius: 9999px;          /* rounded-full */
+    overflow: hidden;
+}
+
+/* 動態進度條本體 */
+#timer-bar {
+    background-color: #ef4444;      /* bg-red-500 */
+    height: 100%;
+    width: 100%;
+    transition: width 1s linear;  /* 讓進度條平滑減少 */
+}
+
+/* 定義 Pulse 動畫 (對應 Tailwind 的 animate-pulse) */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+/* #endregion */
+/* #endregion */
+
+/* 挑戰按鈕 */
+#challenge-buttons {
+    display: flex;
+    gap: var(--gap);
+    justify-content: center;
+    padding: var(--gap-small) 0;
+}
+
+#challenge-buttons button {
+    flex: 1;
+    width: 8rem;
+}
+
+/* 積分變化顯示 */
+#card-score-changes {
+    width: 100%;
+}
+
+.score-change-line {
+    text-align: center;
+    color: rgb(250, 204, 21);
+    font-size: var(--text-small-size);
+    margin: 0.15rem 0;
+    padding: 0;
+}
+
+.score-change-line.drawer-label {
+    color: var(--text-secondary);
+    font-size: var(--text-medium-size);
+    margin-bottom: 0.25rem;
+}
+
+/* #region 底部樣式 */
+#game-footer {
+    flex-shrink: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 0.5rem;
+}
+
+#draw-main-btn {
+    padding: 1.5rem;
+    font-size: var(--text-largest-size);
+}
+/* #endregion */
+
+/* #region 主體佈局：卡牌區 + 側欄 */
+
+/* main 改為橫向，側欄與主內容並排，佔滿整個頁面高度 */
+main {
+    overflow: hidden;
+    flex-direction: row;
+    align-items: stretch;
+    padding-top: 0;
+}
+
+/* 主內容欄：垂直排列，佔剩餘寬度 */
+#game-main {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 1rem;
+    overflow: hidden;
+}
+/* #endregion */
+
+/* #region 卡牌面板 */
+#card-display-box {
+    flex: 1 1 0;
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+/* #endregion */
+
+/* #region 側欄按鈕列 */
+#sidebar-tabs {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--gap);
+    padding: var(--gap-small);
+    background-color: var(--background-color);
+}
+
+.sidebar-tab-btn {
+    width: 3.5rem;
+    height: 3.5rem;
+    font-size: 2rem;
+    margin-right: 0.5rem;
+    background-color: var(--primary-dark);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-medium);
+    color: var(--text-secondary);
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.sidebar-tab-btn:hover,
+.sidebar-tab-btn.active {
+    background-color: var(--primary-blue);
+    color: var(--text-primary);
+    border-color: var(--primary-blue);
+}
+/* #endregion */
+
+/* #region 側欄面板 */
+#sidebar-panel {
+    flex-shrink: 0;
+    width: 0;
+    transition: width 0.3s ease;
+    background-color: var(--background-color);
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#sidebar-panel.open {
+    width: 30vw;
+    min-width: 20rem;
+}
+
+.sidebar-content {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: var(--gap);
+    overflow-y: auto;
+}
+
+.sidebar-content.hidden {
+    display: none;
+}
+
+/* 牌組按鈕列表 */
+#sidebar-deck-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-small);
+    row-gap: var(--gap-small);
+    padding-top: var(--gap-small);
+}
+
+/* 玩家列表 */
+#sidebar-player-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-small);
+    padding-top: var(--gap-small);
+}
+
+.player-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem var(--gap-small);
+    border-radius: var(--border-radius-small);
+    border: 1px solid var(--border-color);
+}
+
+.player-row.player-current {
+    border-color: rgb(59, 130, 246);
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+.player-row.player-drawing {
+    border-color: rgb(251, 146, 60);
+    background-color: rgba(251, 146, 60, 0.1);
+}
+
+.player-row.player-both {
+    border-color: rgb(167, 139, 250);
+    background-color: rgba(167, 139, 250, 0.1);
+}
+
+.player-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    padding: 0;
+    margin: 0;
+}
+
+.player-meta {
+    font-size: var(--text-small-size);
+    color: var(--text-secondary);
+    padding: 0;
+    margin: 0;
+}
+
+.input-container {
+    padding: 0.25rem 0;
+    width: 100%;
+}
+
+.btn-deck span {
+    padding: 0;
+}
+
+.btn-deck {
+    flex: 1;
+}
+
+#sidebar-deck-list span[id^="lb-deck-remaining-"] {
+    width: 1rem;
+    justify-content: center;
+}
+/* #endregion */
