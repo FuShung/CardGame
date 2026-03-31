@@ -1,6 +1,6 @@
 // #region --- 變數 ---
 // --- 組態 ---
-const version = "1.0"; // 版本號
+const version = "1.1"; // 版本號
 const STORAGE_DATA_KEY = 'DRAW_GAME_DATA'; // 永久緩存資料鍵值
 const DEFAULT_DATA_ROOT = 'decks/michael_drama.json'; // 預設載入檔案
 const AUTO_CLEAR_STORAGE = false; // 是否自動清除緩存

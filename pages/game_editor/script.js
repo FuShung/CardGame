@@ -24,89 +24,116 @@
     const selectDrawerMode = document.getElementById('select-drawer-mode');
     const selectDrawerRole = document.getElementById('select-drawer-role');
     const roleListEl       = document.getElementById('role-list');
+    const roleAlert       = document.getElementById('role-editor-alert');
+    const dataAlert       = document.getElementById('data-editor-alert');
     // #endregion
 
-    // 需要指定身分的模式
     const DIGNITY_MODES = new Set([2, 3]);
 
-    // #region --- 身分清單 ---
-    var editingRoles = [];
+    // #region --- 身分清單（字典） ---
+    // editingRoles: { [name]: { count: number } }
+    var editingRoles = {};
 
     function refreshDrawerRoleSelect(selectedName) {
         const isDignityMode = DIGNITY_MODES.has(parseInt(selectDrawerMode.value));
         selectDrawerRole.classList.toggle('hidden', !isDignityMode);
         if (!isDignityMode) return;
-
         selectDrawerRole.innerHTML = '';
-        editingRoles.forEach(r => {
+        Object.keys(editingRoles).forEach(name => {
             const opt = document.createElement('option');
-            opt.value = r.name;
-            opt.textContent = r.name || '（未命名）';
-            if (r.name === selectedName) opt.selected = true;
+            opt.value = name;
+            opt.textContent = name;
+            if (name === selectedName) opt.selected = true;
             selectDrawerRole.appendChild(opt);
         });
     }
 
+    // 渲染單筆身分列，append 到 roleListEl
+    function renderRole(name, role) {
+        const row = document.createElement('div');
+        row.className = 'input-container';
+        row.dataset.roleName = name;
+
+        const nameLabel = document.createElement('span');
+        nameLabel.innerText = name;
+
+        const cMinus = document.createElement('button');
+        cMinus.className = 'btn-outline-dark';
+        cMinus.textContent = '−';
+
+        const countInput = document.createElement('input');
+        countInput.type = 'number';
+        countInput.min  = 1;
+        countInput.value = role.count;
+        countInput.addEventListener('change', () => {
+            const v = parseInt(countInput.value);
+            editingRoles[name].count = isNaN(v) || v < 1 ? 1 : v;
+            countInput.value = editingRoles[name].count;
+        });
+
+        cMinus.addEventListener('click', () => {
+            if (editingRoles[name].count > 1) {
+                editingRoles[name].count--;
+                countInput.value = editingRoles[name].count;
+            } else {
+                renderAlert(roleAlert, `身分「${name}」數量最少為 1，如需移除請按 ✕`, 'gray');
+            }
+        });
+
+        const cPlus = document.createElement('button');
+        cPlus.className = 'btn-outline-blue';
+        cPlus.textContent = '+';
+        cPlus.addEventListener('click', () => {
+            editingRoles[name].count++;
+            countInput.value = editingRoles[name].count;
+            renderAlert(roleAlert);
+        });
+
+        const btnDel = document.createElement('button');
+        btnDel.className = 'btn-outline-red';
+        btnDel.textContent = '✕';
+        btnDel.addEventListener('click', () => {
+            delete editingRoles[name];
+            row.remove();
+            refreshDrawerRoleSelect(selectDrawerRole.value);
+            renderAlert(roleAlert, `已刪除身分「${name}」`, 'red');
+        });
+
+        [nameLabel, cMinus, countInput, cPlus, btnDel].forEach(c => row.appendChild(c));
+        roleListEl.appendChild(row);
+    }
+
     function renderRoleList() {
         roleListEl.innerHTML = '';
-        editingRoles.forEach((role, idx) => {
-            const row = document.createElement('div');
-            row.className = 'input-container role-row';
-
-            const nameLabel = document.createElement('span');
-            nameLabel.innerText = '身分';
-
-            const nameInput = document.createElement('input');
-            nameInput.type = 'text';
-            nameInput.placeholder = '身分名稱';
-            nameInput.value = role.name;
-            nameInput.addEventListener('input', () => {
-                editingRoles[idx].name = nameInput.value;
-                refreshDrawerRoleSelect(selectDrawerRole.value);
-            });
-
-            const countInput = document.createElement('input');
-            countInput.type = 'number';
-            countInput.min  = 1;
-            countInput.value = role.count;
-            countInput.addEventListener('change', () => {
-                const v = parseInt(countInput.value);
-                editingRoles[idx].count = isNaN(v) || v < 1 ? 1 : v;
-                countInput.value = editingRoles[idx].count;
-            });
-
-            const cMinus = document.createElement('button');
-            cMinus.className = 'btn-outline-dark';
-            cMinus.textContent = '−';
-            cMinus.addEventListener('click', () => {
-                if (editingRoles[idx].count > 1) {
-                    editingRoles[idx].count--;
-                    countInput.value = editingRoles[idx].count;
-                }
-            });
-
-            const cPlus = document.createElement('button');
-            cPlus.className = 'btn-outline-blue';
-            cPlus.textContent = '+';
-            cPlus.addEventListener('click', () => {
-                editingRoles[idx].count++;
-                countInput.value = editingRoles[idx].count;
-            });
-
-            const btnDel = document.createElement('button');
-            btnDel.className = 'btn-outline-red';
-            btnDel.textContent = '✕';
-            btnDel.addEventListener('click', () => {
-                editingRoles.splice(idx, 1);
-                renderRoleList();
-                refreshDrawerRoleSelect(selectDrawerRole.value);
-            });
-
-            [nameLabel, nameInput, cMinus, countInput, cPlus, btnDel].forEach(c => row.appendChild(c));
-            roleListEl.appendChild(row);
-        });
+        Object.entries(editingRoles).forEach(([name, role]) => renderRole(name, role));
         refreshDrawerRoleSelect(selectDrawerRole.value);
     }
+    // #endregion
+
+    // #region --- 新增身分 ---
+    const inputRole = document.getElementById('input-role');
+
+    function addRole() {
+        const name = inputRole.value.trim();
+        if (!name) {
+            renderAlert(roleAlert, '請輸入身分名稱', 'red');
+            inputRole.focus();
+            return;
+        }
+        if (editingRoles[name]) {
+            renderAlert(roleAlert, `身分「${name}」已存在`, 'red');
+            inputRole.focus();
+            return;
+        }
+        editingRoles[name] = { count: 1 };
+        renderRole(name, editingRoles[name]);
+        refreshDrawerRoleSelect(selectDrawerRole.value);
+        inputRole.value = '';
+        renderAlert(roleAlert, `身分「${name}」新增完成`, 'green');
+    }
+
+    document.getElementById('btn-add-role').addEventListener('click', addRole);
+    inputRole.addEventListener('keydown', e => { if (e.key === 'Enter') addRole(); });
     // #endregion
 
     // #region --- 載入 ---
@@ -116,13 +143,12 @@
 
         inputTitle.value = data.title || '';
         inputRules.value = data.rules || '';
-
         selectDrawerMode.value = String(data.player_draw_mode ?? 1);
 
-        editingRoles = (data.roles || []).map(r => ({
-            name:  r.name  || '',
-            count: r.count || 1,
-        }));
+        editingRoles = {};
+        (data.roles || []).forEach(r => {
+            if (r.name) editingRoles[r.name] = { count: r.count || 1 };
+        });
         renderRoleList();
         refreshDrawerRoleSelect(data.player_draw_mode_role || '');
     }
@@ -131,32 +157,28 @@
     // #region --- 儲存 ---
     async function save() {
         const title = inputTitle.value.trim();
-        if (!title) { alert('標題不能為空'); return; }
-        for (const r of editingRoles) {
-            if (!r.name.trim()) { alert('身分名稱不能為空'); return; }
+        if (!title) {
+            renderAlert(dataAlert, '請輸入標題', 'red');
+            inputTitle.focus();
+            return;
         }
-
         const drawerMode = parseInt(selectDrawerMode.value);
         const data = await getDeckData();
-        data.title                = title;
-        data.rules                = inputRules.value;
-        data.player_draw_mode     = drawerMode;
+        data.title                 = title;
+        data.rules                 = inputRules.value;
+        data.player_draw_mode      = drawerMode;
         data.player_draw_mode_role = DIGNITY_MODES.has(drawerMode) ? selectDrawerRole.value : '';
-        data.roles                = editingRoles.map(r => ({ name: r.name.trim(), count: r.count }));
+        data.roles = Object.entries(editingRoles).map(([name, r]) => ({ name, count: r.count }));
         setStorageData(data);
         renderTitle(title);
-        alert('已儲存');
+        renderAlert(dataAlert, `遊戲「${title}」儲存完成`, 'green');
     }
     // #endregion
 
     // #region --- 事件綁定 ---
     selectDrawerMode.addEventListener('change', () => {
         refreshDrawerRoleSelect(selectDrawerRole.value);
-    });
-
-    document.getElementById('btn-add-role').addEventListener('click', () => {
-        editingRoles.push({ name: '', count: 1 });
-        renderRoleList();
+        renderAlert(dataAlert);
     });
 
     document.getElementById('btn-save').addEventListener('click', save);
@@ -169,6 +191,7 @@
         a.href = URL.createObjectURL(b);
         a.download = data.title + '.json';
         a.click();
+        renderAlert(dataAlert, `已匯出遊戲「${data.title}」`, 'green');
     });
 
     document.getElementById('btn-import').addEventListener('click', () => {
@@ -180,12 +203,18 @@
         r.onload = async (ev) => {
             let data;
             try { data = JSON.parse(ev.target.result); }
-            catch { alert('匯入失敗：檔案不是有效的 JSON 格式'); return; }
+            catch {
+                renderAlert(dataAlert, '匯入失敗：不是有效的 JSON 格式', 'red');
+                return;
+            }
             const err = validateDeckData(data);
-            if (err) { alert(`匯入失敗：${err}`); return; }
+            if (err) {
+                renderAlert(dataAlert, `匯入失敗：${err}`, 'red');
+                return;
+            }
             setStorageData(ev.target.result);
             await load();
-            alert(`已匯入「${data.title}」，共 ${data.cards.length} 張卡牌、${data.decks.length} 個牌組`);
+            renderAlert(dataAlert, `已匯入「${data.title}」，共 ${data.cards.length} 張卡牌、${data.decks.length} 個牌組`, 'green');
         };
         r.readAsText(e.target.files[0]);
         e.target.value = '';

@@ -126,6 +126,27 @@ function applyActions(card, trigger, state) {
                 card._resolved_next_deck = deckName;
                 results.push({ kind: 'change_deck', target: deckName });
             }
+
+        } else if (action.type === 'item_changes') {
+            const targets = resolveTarget(action.target || 'skip:0', state);
+            // 相容舊格式（字串陣列）與新格式（{ item, count } 陣列）
+            const normalizeList = arr => (arr || []).map(e =>
+                typeof e === 'string' ? { item: e, count: 1 } : e);
+            const giveList = normalizeList(action.give);
+            const takeList = normalizeList(action.take);
+            targets.forEach(idx => {
+                const p = state.players[idx];
+                if (!p) return;
+                if (!p.items) p.items = [];
+                giveList.forEach(({ item, count }) => {
+                    for (let i = 0; i < (count || 1); i++) p.items.push(item);
+                });
+                takeList.forEach(({ item, count }) => {
+                    let n = count || 1;
+                    p.items = p.items.filter(i => { if (i === item && n > 0) { n--; return false; } return true; });
+                });
+            });
+            results.push({ kind: 'item_changes', targetLabel: resolveTargetLabel(action.target || 'skip:0', state), give: giveList, take: takeList });
         }
     });
 
@@ -195,5 +216,135 @@ function formatActionResult(r, state) {
         return `指定抽卡：${t}`;
     }
     if (r.kind === 'change_deck') return `切換牌組：${r.target}`;
+    if (r.kind === 'item_changes') {
+        const parts = [];
+        if (r.give.length) parts.push(`獲得：${r.give.map(e => e.count > 1 ? `${e.item}×${e.count}` : e.item).join('、')}`);
+        if (r.take.length) parts.push(`失去：${r.take.map(e => e.count > 1 ? `${e.item}×${e.count}` : e.item).join('、')}`);
+        return `${r.targetLabel}道具 ${parts.join('，')}`;
+    }
     return '';
+}
+
+/**
+ * 解析並評估 requires 表達式
+ * 語法：道具名稱、AND、OR、NOT、()
+ * 例：道具A AND (道具B OR NOT 道具C)
+ */
+function evalRequiresExpr(expr, items) {
+    if (!expr || !expr.trim()) return true;
+    const tokens = tokenizeRequires(expr);
+    try {
+        const [result] = parseRequiresOr(tokens, 0, items);
+        return result;
+    } catch (e) {
+        return true; // 解析失敗視為無條件
+    }
+}
+
+function tokenizeRequires(expr) {
+    const tokens = [];
+    const re = /\bAND\b|\bOR\b|\bNOT\b|[()]/g;
+    let last = 0, m;
+    while ((m = re.exec(expr)) !== null) {
+        const before = expr.slice(last, m.index).trim();
+        if (before) tokens.push({ type: 'item', value: before });
+        tokens.push({ type: m[0] === '(' || m[0] === ')' ? m[0] : 'op', value: m[0] });
+        last = re.lastIndex;
+    }
+    const tail = expr.slice(last).trim();
+    if (tail) tokens.push({ type: 'item', value: tail });
+    return tokens;
+}
+
+function parseRequiresOr(tokens, pos, items) {
+    let [left, p] = parseRequiresAnd(tokens, pos, items);
+    while (p < tokens.length && tokens[p]?.value === 'OR') {
+        const [right, np] = parseRequiresAnd(tokens, p + 1, items);
+        left = left || right;
+        p = np;
+    }
+    return [left, p];
+}
+
+function parseRequiresAnd(tokens, pos, items) {
+    let [left, p] = parseRequiresNot(tokens, pos, items);
+    while (p < tokens.length && tokens[p]?.value === 'AND') {
+        const [right, np] = parseRequiresNot(tokens, p + 1, items);
+        left = left && right;
+        p = np;
+    }
+    return [left, p];
+}
+
+function parseRequiresNot(tokens, pos, items) {
+    if (tokens[pos]?.value === 'NOT') {
+        const [val, np] = parseRequiresPrimary(tokens, pos + 1, items);
+        return [!val, np];
+    }
+    return parseRequiresPrimary(tokens, pos, items);
+}
+
+function parseRequiresPrimary(tokens, pos, items) {
+    if (tokens[pos]?.value === '(') {
+        const [val, np] = parseRequiresOr(tokens, pos + 1, items);
+        return [val, np + 1]; // skip ')'
+    }
+    if (tokens[pos]?.type === 'item') {
+        return [items.includes(tokens[pos].value), pos + 1];
+    }
+    return [true, pos];
+}
+
+function checkCardRequires(card, state) {
+    const expr = card.requires;
+    if (!expr || typeof expr !== 'string' || !expr.trim()) {
+        // 即使無 requires，仍需檢查 item_changes 的道具數量限制
+        return checkItemChangesEligible(card, state);
+    }
+    const player = state.players[state.currentPlayerIdx];
+    if (!player) return true;
+    if (!evalRequiresExpr(expr, player.items || [])) return false;
+    return checkItemChangesEligible(card, state);
+}
+
+/**
+ * 檢查卡牌的 item_changes action 是否符合玩家道具狀態：
+ * - take 道具：玩家必須持有該道具
+ * - give 道具：玩家持有數量必須未達 max_count
+ */
+function checkItemChangesEligible(card, state) {
+    const actions = card.actions || [];
+    const player = state.players[state.currentPlayerIdx];
+    if (!player) return true;
+    const playerItems = player.items || [];
+    const itemDefs = state.items || {};
+
+    for (const action of actions) {
+        if (action.type !== 'item_changes') continue;
+        // 只檢查當前玩家（skip:0）的 action，其他目標不影響抽卡資格
+        const target = action.target || 'skip:0';
+        if (target !== 'skip:0' && target !== 'current') continue;
+
+        const normalizeList = arr => (arr || []).map(e =>
+            typeof e === 'string' ? { item: e, count: 1 } : e);
+        // take：玩家必須持有足夠數量
+        if (action.take && action.take.length) {
+            for (const { item, count } of normalizeList(action.take)) {
+                const owned = playerItems.filter(i => i === item).length;
+                if (owned < (count || 1)) return false;
+            }
+        }
+        // give：玩家持有數量未達 max_count
+        if (action.give && action.give.length) {
+            for (const { item, count } of normalizeList(action.give)) {
+                const def = itemDefs[item];
+                const maxCount = def?.max_count ?? 1;
+                if (maxCount > 0) {
+                    const owned = playerItems.filter(i => i === item).length;
+                    if (owned + (count || 1) > maxCount) return false;
+                }
+            }
+        }
+    }
+    return true;
 }

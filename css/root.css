@@ -30,6 +30,9 @@
     --action-hover: rgb(96, 165, 250);    /* 滑鼠懸停色 */
     --action-active: rgb(37, 99, 235);   /* 點擊瞬間色 */
 
+    /* 定義主要面板大小 */
+    --body-width: 50rem;
+
     /* 定義文字大小 */
     --text-largest-size: 2rem;
     --text-large-size: 1.25rem;

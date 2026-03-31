@@ -42,6 +42,9 @@
     --action-hover: rgb(96, 165, 250);    /* 滑鼠懸停色 */
     --action-active: rgb(37, 99, 235);   /* 點擊瞬間色 */
 
+    /* 定義主要面板大小 */
+    --body-width: 50rem;
+
     /* 定義文字大小 */
     --text-largest-size: 2rem;
     --text-large-size: 1.25rem;
@@ -145,6 +148,10 @@ input, textarea {
     font-size: var(--text-medium-size);
 }
 
+textarea {
+    min-height: 10rem;
+}
+
 input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
@@ -205,6 +212,80 @@ main {
     overflow-y: auto;
     overflow-x: hidden;
 }
+
+/* ================================================
+   Combobox（搜尋下拉）
+   ================================================ */
+
+/* 作為 input-container 子元素時，繼承 flex 伸縮與圓角規則 */
+.combobox-wrap {
+    position: relative;
+    flex: 1.5;
+    min-width: 0;
+    height: 3rem;
+    display: flex;
+    align-items: stretch;
+    border-radius: var(--border-radius-small);
+}
+
+.combobox-wrap > input {
+    width: 100%;
+    height: 100%;
+    font-size: var(--text-large-size);
+    border-radius: var(--border-radius-small);
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.combobox-wrap > .card-dropdown {
+    position: absolute;
+    height: auto;
+}
+
+.card-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background-color: var(--primary-dark);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-medium);
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem 0;
+    z-index: 100;
+    max-height: 16rem;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.card-dropdown li {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: var(--text-medium-size);
+    transition: background-color 0.1s;
+}
+
+.card-dropdown li:hover {
+    background-color: rgba(59, 130, 246, 0.2);
+    color: rgb(96, 165, 250);
+}
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+    user-select: none;
+}
+
+div.disabled {
+    filter: blur(2px);
+}
+
+.hidden { display: none !important; }
+.fade-out { opacity: 0; pointer-events: none; }
+
+/* css/button.css */
 
 /* ================================================
    按鈕變體
@@ -292,162 +373,48 @@ main {
 }
 
 /* ================================================
-   輸入容器
+   切換按鈕 (input[type=checkbox])
+   基礎樣式已在全域 input[type="checkbox"] 定義
+   class: input-check-[color]，未指定時等同 input-check-blue
    ================================================ */
 
-.input-container {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-small);
-    margin: var(--gap-small);
-    width: fit-content;
-    text-wrap: nowrap;
-    font-size: var(--text-large-size);
-    color: var(--text-primary);
+/* blue（預設，未指定 class 時也套用） */
+input[type="checkbox"].input-check-blue::before,
+input[type="checkbox"]:not([class*="input-check"])::before { content: attr(data-label-off); }
+
+input[type="checkbox"].input-check-blue,
+input[type="checkbox"]:not([class*="input-check"]) {
+    color: rgb(59, 130, 246);
+    border-color: rgb(59, 130, 246);
 }
-
-.input-container > label,
-.input-container > span,
-.input-container > p {
-    font-size: var(--text-large-size);
-    background-color: var(--border-color);
-    padding: 0.5rem 1.5rem;
-    align-self: stretch;
-    display: flex;
-    align-items: center;
-    margin: 0;
+input[type="checkbox"].input-check-blue:checked,
+input[type="checkbox"]:not([class*="input-check"]):checked {
+    color: #fff;
+    background-color: rgb(37, 99, 235);
+    border-color: rgb(37, 99, 235);
 }
+input[type="checkbox"].input-check-blue:checked::before,
+input[type="checkbox"]:not([class*="input-check"]):checked::before { content: attr(data-label-on); }
 
-.input-container > button,
-.input-container > a,
-.input-container > select,
-.input-container > input {
-    border-radius: var(--border-radius-small);
-    margin: 0;
-}
+/* green */
+input[type="checkbox"].input-check-green { color: rgb(34, 197, 94); border-color: rgb(34, 197, 94); }
+input[type="checkbox"].input-check-green::before { content: attr(data-label-off); }
+input[type="checkbox"].input-check-green:checked { color: #fff; background-color: rgb(21, 128, 61); border-color: rgb(21, 128, 61); }
+input[type="checkbox"].input-check-green:checked::before { content: attr(data-label-on); }
 
-.input-container > :first-child {
-    border-top-left-radius: var(--border-radius);
-    border-bottom-left-radius: var(--border-radius);
-}
+/* red */
+input[type="checkbox"].input-check-red { color: rgb(239, 68, 68); border-color: rgb(239, 68, 68); }
+input[type="checkbox"].input-check-red::before { content: attr(data-label-off); }
+input[type="checkbox"].input-check-red:checked { color: #fff; background-color: rgb(185, 28, 28); border-color: rgb(185, 28, 28); }
+input[type="checkbox"].input-check-red:checked::before { content: attr(data-label-on); }
 
-.input-container > :last-child {
-    border-top-right-radius: var(--border-radius);
-    border-bottom-right-radius: var(--border-radius);
-}
+/* dark */
+input[type="checkbox"].input-check-dark { color: rgb(148, 163, 184); border-color: rgb(148, 163, 184); }
+input[type="checkbox"].input-check-dark::before { content: attr(data-label-off); }
+input[type="checkbox"].input-check-dark:checked { color: #fff; background-color: rgb(30, 41, 59); border-color: rgb(30, 41, 59); }
+input[type="checkbox"].input-check-dark:checked::before { content: attr(data-label-on); }
 
-.input-container.full-w,
-.input-container.full-w > button,
-.input-container.full-w > select,
-.input-container.full-w > input {
-    width: 100%;
-}
-
-/* ================================================
-   Combobox（搜尋下拉）
-   ================================================ */
-
-/* 作為 input-container 子元素時，繼承 flex 伸縮與圓角規則 */
-.combobox-wrap {
-    position: relative;
-    flex: 1.5;
-    min-width: 0;
-    height: 3rem;
-    display: flex;
-    align-items: stretch;
-    border-radius: var(--border-radius-small);
-}
-
-.combobox-wrap > input {
-    width: 100%;
-    height: 100%;
-    font-size: var(--text-large-size);
-    border-radius: var(--border-radius-small);
-    box-sizing: border-box;
-    margin: 0;
-}
-
-.combobox-wrap > .card-dropdown {
-    position: absolute;
-    height: auto;
-}
-
-/* 繼承 input-container 首尾圓角規則 */
-.input-container > .combobox-wrap:first-child > input {
-    border-top-left-radius: var(--border-radius);
-    border-bottom-left-radius: var(--border-radius);
-}
-
-.input-container > .combobox-wrap:last-child > input {
-    border-top-right-radius: var(--border-radius);
-    border-bottom-right-radius: var(--border-radius);
-}
-
-.card-dropdown {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    right: 0;
-    background-color: var(--primary-dark);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-medium);
-    list-style: none;
-    margin: 0;
-    padding: 0.25rem 0;
-    z-index: 100;
-    max-height: 16rem;
-    overflow-y: auto;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-}
-
-.card-dropdown li {
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    color: var(--text-primary);
-    font-size: var(--text-medium-size);
-    transition: background-color 0.1s;
-}
-
-.card-dropdown li:hover {
-    background-color: rgba(59, 130, 246, 0.2);
-    color: rgb(96, 165, 250);
-}
-
-/* ================================================
-   列表容器
-   ================================================ */
-
-.list-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--gap);
-    overflow-y: auto;
-    max-height: 80vh;
-    padding: var(--gap);
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.scale-list-container {
-    display: grid;
-    /* auto-fill 根據容器實際可用寬度決定欄數，不依賴視窗斷點 */
-    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
-    gap: var(--gap);
-    align-items: start;         /* 各格高度獨立，不互相撐高 */
-    overflow-y: auto;
-    max-height: 80vh;
-    padding: var(--gap);
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.vec-list-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--gap);
-    width: 100%;
-    box-sizing: border-box;
-}
+/* css/pop_modal.css */
 
 /* ================================================
    彈出元件
@@ -490,60 +457,251 @@ main {
     background-color: rgba(239, 68, 68, 0.2);
 }
 
+/* css/container.css */
 /* ================================================
-   切換按鈕 (input[type=checkbox])
-   基礎樣式已在全域 input[type="checkbox"] 定義
-   class: input-check-[color]，未指定時等同 input-check-blue
+   列表容器
    ================================================ */
 
-/* blue（預設，未指定 class 時也套用） */
-input[type="checkbox"].input-check-blue::before,
-input[type="checkbox"]:not([class*="input-check"])::before { content: attr(data-label-off); }
-
-input[type="checkbox"].input-check-blue,
-input[type="checkbox"]:not([class*="input-check"]) {
-    color: rgb(59, 130, 246);
-    border-color: rgb(59, 130, 246);
+.list-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--gap);
+    overflow-y: auto;
+    max-height: 80vh;
+    padding: var(--gap);
+    width: 100%;
+    box-sizing: border-box;
 }
-input[type="checkbox"].input-check-blue:checked,
-input[type="checkbox"]:not([class*="input-check"]):checked {
+
+.scale-list-container {
+    display: grid;
+    /* auto-fill 根據容器實際可用寬度決定欄數，不依賴視窗斷點 */
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    gap: var(--gap);
+    align-items: start;         /* 各格高度獨立，不互相撐高 */
+    overflow-y: auto;
+    max-height: 80vh;
+    padding: var(--gap);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.vec-list-container {
+    display: flex;
+    flex-direction:column;
+    flex-wrap: wrap;
+    gap: var(--gap);
+    width: 100%;
+    min-width: var(--body-width);
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ================================================
+   輸入容器
+   ================================================ */
+
+.input-container {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-small);
+    margin: var(--gap-small);
+    width: fit-content;
+    text-wrap: nowrap;
+    font-size: var(--text-large-size);
+    color: var(--text-primary);
+}
+
+p.main,
+span.main,
+label.main,
+.input-container.main {
+    min-width: var(--body-width);
+}
+
+.input-container > label,
+.input-container > span,
+.input-container > p {
+    font-size: var(--text-large-size);
+    background-color: var(--border-color);
+    padding: 0.5rem 1.5rem;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+.input-container > button,
+.input-container > a,
+.input-container > select,
+.input-container > input {
+    border-radius: var(--border-radius-small);
+    margin: 0;
+}
+
+.input-container > :first-child {
+    border-top-left-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+}
+
+.input-container > :last-child {
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
+
+/* 繼承 input-container 首尾圓角規則 */
+.input-container > .combobox-wrap:first-child > input {
+    border-top-left-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+}
+
+.input-container > .combobox-wrap:last-child > input {
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
+
+div.full-w {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+p.full-w,
+label.full-w,
+span.full-w {
+    width: 100%;
+}
+
+button.full-w,
+select.full-w,
+input.full-w,
+.input-container.full-w,
+.input-container.full-w > button,
+.input-container.full-w > select,
+.input-container.full-w > input {
+    width: 100%;
+}
+
+/* css/label.css */
+/* ================================================
+   Alert Label（狀態提示標籤）
+   ================================================ */
+
+.alert-blue,
+.alert-green,
+.alert-red,
+.alert-gray,
+.alert-dark,
+p.alert-blue,
+p.alert-green,
+p.alert-red,
+p.alert-gray,
+p.alert-dark,
+label.alert-blue,
+label.alert-green,
+label.alert-red,
+label.alert-gray,
+label.alert-dark,
+span.alert-blue,
+span.alert-green,
+span.alert-red,
+span.alert-gray,
+span.alert-dark
+{
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: var(--gap);
+    padding: var(--gap-small);
+    border-radius: var(--border-radius-medium);
+    font-size: var(--text-large-size);
+    letter-spacing: 0.05em;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+}
+
+.alert-blue {
+    color: rgb(147, 197, 253);
+    background-color: rgba(37, 99, 235, 0.2);
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: var(--shadow-size) var(--primary-blue-shadow);
+}
+
+.alert-green {
+    color: rgb(134, 239, 172);
+    background-color: rgba(21, 128, 61, 0.2);
+    border-color: rgba(34, 197, 94, 0.4);
+    box-shadow: var(--shadow-size) var(--primary-green-shadow);
+}
+
+.alert-red {
+    color: rgb(252, 165, 165);
+    background-color: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+    box-shadow: var(--shadow-size) var(--primary-red-shadow);
+}
+
+.alert-gray {
+    color: rgb(203, 213, 225);
+    background-color: rgba(71, 85, 105, 0.25);
+    border-color: rgba(71, 85, 105, 0.5);
+    box-shadow: var(--shadow-size) var(--primary-gray-shadow);
+}
+
+.alert-dark {
+    color: var(--text-secondary);
+    background-color: rgba(30, 41, 59, 0.4);
+    border-color: var(--border-color);
+    box-shadow: var(--shadow-size) var(--primary-dark-shadow);
+}
+
+/* css/pop_modal.css */
+
+/* ================================================
+   彈出元件
+   ================================================ */
+
+.pop-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 1.5rem;
+    z-index: 20;
+    background-color: #0f172a;
+    border-radius: 1rem;
+    border: 1px solid #334155;
+}
+
+.modal-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    font-size: 1.25rem;
+    line-height: 1;
+    color: rgb(148, 163, 184);
+    background: none;
+    border: none;
+    border-radius: var(--border-radius-small);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s, background-color 0.15s;
+}
+
+.modal-close:hover {
     color: #fff;
-    background-color: rgb(37, 99, 235);
-    border-color: rgb(37, 99, 235);
+    background-color: rgba(239, 68, 68, 0.2);
 }
-input[type="checkbox"].input-check-blue:checked::before,
-input[type="checkbox"]:not([class*="input-check"]):checked::before { content: attr(data-label-on); }
-
-/* green */
-input[type="checkbox"].input-check-green { color: rgb(34, 197, 94); border-color: rgb(34, 197, 94); }
-input[type="checkbox"].input-check-green::before { content: attr(data-label-off); }
-input[type="checkbox"].input-check-green:checked { color: #fff; background-color: rgb(21, 128, 61); border-color: rgb(21, 128, 61); }
-input[type="checkbox"].input-check-green:checked::before { content: attr(data-label-on); }
-
-/* red */
-input[type="checkbox"].input-check-red { color: rgb(239, 68, 68); border-color: rgb(239, 68, 68); }
-input[type="checkbox"].input-check-red::before { content: attr(data-label-off); }
-input[type="checkbox"].input-check-red:checked { color: #fff; background-color: rgb(185, 28, 28); border-color: rgb(185, 28, 28); }
-input[type="checkbox"].input-check-red:checked::before { content: attr(data-label-on); }
-
-/* dark */
-input[type="checkbox"].input-check-dark { color: rgb(148, 163, 184); border-color: rgb(148, 163, 184); }
-input[type="checkbox"].input-check-dark::before { content: attr(data-label-off); }
-input[type="checkbox"].input-check-dark:checked { color: #fff; background-color: rgb(30, 41, 59); border-color: rgb(30, 41, 59); }
-input[type="checkbox"].input-check-dark:checked::before { content: attr(data-label-on); }
-
-.disabled {
-    pointer-events: none;
-    opacity: 0.6;
-    user-select: none;
-}
-
-div.disabled {
-    filter: blur(2px);
-}
-
-.hidden { display: none !important; }
-.fade-out { opacity: 0; pointer-events: none; }
 
 /* css/glass.css */
 /* --- 分隔線 --- */
@@ -558,7 +716,7 @@ div.disabled {
 .glass-card {
   /* 基礎版型與間距 */
   width: 100%;
-  max-width: 50rem;
+  max-width: var(--body-width);
   padding: var(--gap);
   margin: var(--gap);
   display: flex;
@@ -785,6 +943,7 @@ function switchNavTab(button, page, config) {
     url.searchParams.set('page', page);
     window.history.pushState({}, '', url);
 }
+
 async function renderPage(page, config) {
     // 切換頁面前先執行清理（清除計時器等背景資源）
     _cleanupCurrentPage();
@@ -934,6 +1093,18 @@ function renderStarts(container, value) {
             star.classList.remove('active');
         }
     });
+}
+
+// alert標籤
+function renderAlert(label, text = false, color='red') {
+    if(text) {
+        label.innerText = text;
+        label.className = `alert-${color}`;
+    }
+    else {
+        label.innerText = '';
+        label.className = 'hidden';
+    }
 }
 // #endregion
 
@@ -1093,6 +1264,27 @@ function applyActions(card, trigger, state) {
                 card._resolved_next_deck = deckName;
                 results.push({ kind: 'change_deck', target: deckName });
             }
+
+        } else if (action.type === 'item_changes') {
+            const targets = resolveTarget(action.target || 'skip:0', state);
+            // 相容舊格式（字串陣列）與新格式（{ item, count } 陣列）
+            const normalizeList = arr => (arr || []).map(e =>
+                typeof e === 'string' ? { item: e, count: 1 } : e);
+            const giveList = normalizeList(action.give);
+            const takeList = normalizeList(action.take);
+            targets.forEach(idx => {
+                const p = state.players[idx];
+                if (!p) return;
+                if (!p.items) p.items = [];
+                giveList.forEach(({ item, count }) => {
+                    for (let i = 0; i < (count || 1); i++) p.items.push(item);
+                });
+                takeList.forEach(({ item, count }) => {
+                    let n = count || 1;
+                    p.items = p.items.filter(i => { if (i === item && n > 0) { n--; return false; } return true; });
+                });
+            });
+            results.push({ kind: 'item_changes', targetLabel: resolveTargetLabel(action.target || 'skip:0', state), give: giveList, take: takeList });
         }
     });
 
@@ -1162,7 +1354,137 @@ function formatActionResult(r, state) {
         return `指定抽卡：${t}`;
     }
     if (r.kind === 'change_deck') return `切換牌組：${r.target}`;
+    if (r.kind === 'item_changes') {
+        const parts = [];
+        if (r.give.length) parts.push(`獲得：${r.give.map(e => e.count > 1 ? `${e.item}×${e.count}` : e.item).join('、')}`);
+        if (r.take.length) parts.push(`失去：${r.take.map(e => e.count > 1 ? `${e.item}×${e.count}` : e.item).join('、')}`);
+        return `${r.targetLabel}道具 ${parts.join('，')}`;
+    }
     return '';
+}
+
+/**
+ * 解析並評估 requires 表達式
+ * 語法：道具名稱、AND、OR、NOT、()
+ * 例：道具A AND (道具B OR NOT 道具C)
+ */
+function evalRequiresExpr(expr, items) {
+    if (!expr || !expr.trim()) return true;
+    const tokens = tokenizeRequires(expr);
+    try {
+        const [result] = parseRequiresOr(tokens, 0, items);
+        return result;
+    } catch (e) {
+        return true; // 解析失敗視為無條件
+    }
+}
+
+function tokenizeRequires(expr) {
+    const tokens = [];
+    const re = /\bAND\b|\bOR\b|\bNOT\b|[()]/g;
+    let last = 0, m;
+    while ((m = re.exec(expr)) !== null) {
+        const before = expr.slice(last, m.index).trim();
+        if (before) tokens.push({ type: 'item', value: before });
+        tokens.push({ type: m[0] === '(' || m[0] === ')' ? m[0] : 'op', value: m[0] });
+        last = re.lastIndex;
+    }
+    const tail = expr.slice(last).trim();
+    if (tail) tokens.push({ type: 'item', value: tail });
+    return tokens;
+}
+
+function parseRequiresOr(tokens, pos, items) {
+    let [left, p] = parseRequiresAnd(tokens, pos, items);
+    while (p < tokens.length && tokens[p]?.value === 'OR') {
+        const [right, np] = parseRequiresAnd(tokens, p + 1, items);
+        left = left || right;
+        p = np;
+    }
+    return [left, p];
+}
+
+function parseRequiresAnd(tokens, pos, items) {
+    let [left, p] = parseRequiresNot(tokens, pos, items);
+    while (p < tokens.length && tokens[p]?.value === 'AND') {
+        const [right, np] = parseRequiresNot(tokens, p + 1, items);
+        left = left && right;
+        p = np;
+    }
+    return [left, p];
+}
+
+function parseRequiresNot(tokens, pos, items) {
+    if (tokens[pos]?.value === 'NOT') {
+        const [val, np] = parseRequiresPrimary(tokens, pos + 1, items);
+        return [!val, np];
+    }
+    return parseRequiresPrimary(tokens, pos, items);
+}
+
+function parseRequiresPrimary(tokens, pos, items) {
+    if (tokens[pos]?.value === '(') {
+        const [val, np] = parseRequiresOr(tokens, pos + 1, items);
+        return [val, np + 1]; // skip ')'
+    }
+    if (tokens[pos]?.type === 'item') {
+        return [items.includes(tokens[pos].value), pos + 1];
+    }
+    return [true, pos];
+}
+
+function checkCardRequires(card, state) {
+    const expr = card.requires;
+    if (!expr || typeof expr !== 'string' || !expr.trim()) {
+        // 即使無 requires，仍需檢查 item_changes 的道具數量限制
+        return checkItemChangesEligible(card, state);
+    }
+    const player = state.players[state.currentPlayerIdx];
+    if (!player) return true;
+    if (!evalRequiresExpr(expr, player.items || [])) return false;
+    return checkItemChangesEligible(card, state);
+}
+
+/**
+ * 檢查卡牌的 item_changes action 是否符合玩家道具狀態：
+ * - take 道具：玩家必須持有該道具
+ * - give 道具：玩家持有數量必須未達 max_count
+ */
+function checkItemChangesEligible(card, state) {
+    const actions = card.actions || [];
+    const player = state.players[state.currentPlayerIdx];
+    if (!player) return true;
+    const playerItems = player.items || [];
+    const itemDefs = state.items || {};
+
+    for (const action of actions) {
+        if (action.type !== 'item_changes') continue;
+        // 只檢查當前玩家（skip:0）的 action，其他目標不影響抽卡資格
+        const target = action.target || 'skip:0';
+        if (target !== 'skip:0' && target !== 'current') continue;
+
+        const normalizeList = arr => (arr || []).map(e =>
+            typeof e === 'string' ? { item: e, count: 1 } : e);
+        // take：玩家必須持有足夠數量
+        if (action.take && action.take.length) {
+            for (const { item, count } of normalizeList(action.take)) {
+                const owned = playerItems.filter(i => i === item).length;
+                if (owned < (count || 1)) return false;
+            }
+        }
+        // give：玩家持有數量未達 max_count
+        if (action.give && action.give.length) {
+            for (const { item, count } of normalizeList(action.give)) {
+                const def = itemDefs[item];
+                const maxCount = def?.max_count ?? 1;
+                if (maxCount > 0) {
+                    const owned = playerItems.filter(i => i === item).length;
+                    if (owned + (count || 1) > maxCount) return false;
+                }
+            }
+        }
+    }
+    return true;
 }
 
 /* js/draw.js */
@@ -1198,17 +1520,35 @@ function drawByDeck(deckName, state, lbDeckRemaining) {
     }
 
     const s = deck.runtimeStates;
+    // 過濾不符合 requires 條件的卡（RANDOM/REDRAW 模式）
+    const eligiblePool = (deck.draw_mode !== SEQUENCE_MODE && state.cards)
+        ? s.pool.filter(name => {
+            const card = state.cards[name];
+            return !card || checkCardRequires(card, state);
+          })
+        : s.pool;
+
     let cardName;
     switch (deck.draw_mode) {
         case RANDOM_MODE:
             s.remaining--;
         case REDRAW_MODE:
-            cardName = s.pool[Math.floor(Math.random() * s.pool.length)];
+            if (!eligiblePool.length) return '';
+            cardName = eligiblePool[Math.floor(Math.random() * eligiblePool.length)];
             break;
         case SEQUENCE_MODE:
-            cardName = s.pool[s.nextIdx];
-            s.remaining--;
-            s.nextIdx++;
+            // 順序模式：跳過不符合條件的卡
+            while (s.nextIdx < s.pool.length) {
+                const candidate = s.pool[s.nextIdx];
+                s.nextIdx++;
+                s.remaining--;
+                const card = state.cards && state.cards[candidate];
+                if (!card || checkCardRequires(card, state)) {
+                    cardName = candidate;
+                    break;
+                }
+            }
+            if (!cardName) return '';
             break;
     }
 
@@ -1328,7 +1668,7 @@ function advancePlayer(card, state) {
     <!-- page: card_editor -->
     <template id="page-card_editor">
     <!-- 卡牌編輯器 -->
-    <div id="btn-group" class="input-container">
+    <div id="btn-group" class="input-container main">
         <button id="select-card-btn" class="btn-lg btn-primary-dark">卡牌列表</button>
         <div class="combobox-wrap">
             <input id="input-card-search" type="text" placeholder="搜尋或輸入新卡牌名稱" autocomplete="off">
@@ -1337,50 +1677,67 @@ function advancePlayer(card, state) {
         <button id="btn-save-edit" class="btn-lg btn-primary-green">儲存</button>
         <button id="btn-delete-card" class="btn-lg btn-primary-red disabled">刪除</button>
     </div>
+    <span id="card-editor-alert" class="hidden"></span>
+    <h2 id="edit-card-name">卡牌</h2>
+    <div id="edit-card-rarity-star" class="star-editor" for="edit-card-rarity"></div>
+    <input id="edit-card-rarity" type="number" min="1" max="5" value="1" hidden>
 
-    <div class="glass-card editor-card">
-        <h2 id="edit-card-name">卡牌</h2>
-        <div class="editor-header">
-            <div id="edit-card-rarity-star" class="star-editor" for="edit-card-rarity"></div>
-            <input id="edit-card-rarity" type="number" min="1" max="5" value="1" hidden>
-        </div>
+    <!-- 效果內容 -->
 
-        <div class="editor-body">
-            <!-- 效果內容 -->
-            <div class="input-container full-w">
-                <label for="edit-card-effect">內容</label>
-                <textarea id="edit-card-effect" placeholder="效果內容，如: 獲得 [100, 200] 點"></textarea>
-            </div>
+    <div class="input-container main">
+        <span>抽卡條件</span>
+        <button id="btn-edit-requires" class="btn-primary-dark full-w">（無條件）</button>
+    </div>
 
-            <div class="input-container full-w">
-                <input id="edit-is-challenge" type="checkbox" class="input-check-green"
-                    data-label-off="挑戰模式：關閉" data-label-on="挑戰模式：啟用">
-                <label>效果</label>
-                <select id="select-add-action">
-                    <option value="">選擇效果類型</option>
-                    <option value="score">積分</option>
-                    <option value="swap_roles">身分交換</option>
-                    <option value="change_draw_mode">抽卡模式</option>
-                    <option value="change_draw_player">指定抽卡人員</option>
-                    <option value="change_deck">切換牌組</option>
-                </select>
-                <button id="btn-add-action" class="btn-outline-green">＋ 新增</button>
-            </div>
+    <div class="input-container main">
+        <label for="edit-card-effect">內容</label>
+        <textarea id="edit-card-effect" placeholder="效果內容，如: 獲得 [100, 200] 點"></textarea>
+    </div>
 
-            <!-- 效果列表 -->
-            <div id="section-actions">
-                <div class="editor-field-header">
-
-                </div>
-                <div id="actions-list"></div>
-            </div>
-        </div>
+    <div class="input-container main">
+        <label>效果</label>
+        <select id="select-add-action">
+            <option value="">選擇效果類型</option>
+            <option value="score">積分</option>
+            <option value="swap_roles">身分交換</option>
+            <option value="change_draw_mode">抽卡模式</option>
+            <option value="change_draw_player">指定抽卡人員</option>
+            <option value="change_deck">切換牌組</option>
+            <option value="item_changes">道具</option>
+        </select>
+        <button id="btn-add-action" class="btn-outline-green">＋ 新增</button>
+        <input id="edit-is-challenge" type="checkbox" class="input-check-green"
+            data-label-off="挑戰模式：關閉" data-label-on="挑戰模式：啟用"></div>
+    <br />
+    <div id="actions-list" class="vec-list-container">
     </div>
 
     <div id="card-editor-modal" class="pop-modal hidden">
         <button class="modal-close" aria-label="關閉">✕</button>
         <h2>卡牌列表</h2>
         <div id="card-prototype-list" class="scale-list-container"></div>
+    </div>
+
+    <div id="requires-modal" class="pop-modal hidden">
+        <button class="modal-close" aria-label="關閉">✕</button>
+        <h2>抽卡條件</h2>
+        <div class="requires-editor">
+            <div class="input-container">
+                <select id="requires-item-select"><option value="">選擇道具</option></select>
+                <button class="btn-outline-dark" data-insert="AND">AND</button>
+                <button class="btn-outline-dark" data-insert="OR">OR</button>
+                <button class="btn-outline-dark" data-insert="NOT">NOT</button>
+                <button class="btn-outline-dark" data-insert="(">(</button>
+                <button class="btn-outline-dark" data-insert=")">)</button>
+                <button class="btn-outline-dark" data-insert="()">()</button>
+            </div>
+            <textarea id="requires-expr" placeholder="例：道具A AND (道具B OR NOT 道具C)"></textarea>
+            <div id="requires-preview-msg" class="requires-msg"></div>
+            <div class="input-container full-w">
+                <button id="btn-requires-clear" class="btn-outline-red">清除</button>
+                <button id="btn-requires-confirm" class="btn-primary-green btn-lg">確認</button>
+            </div>
+        </div>
     </div>
     </template>
     <style id="style-card_editor">
@@ -1459,11 +1816,6 @@ function advancePlayer(card, state) {
     overflow-y: auto;
 }
 
-#card-editor-modal > .input-container,
-#card-editor-modal > .input-container > button {
-    width: 100%;
-}
-
 #edit-card-effect {
     min-height: 8rem;
     width: 100%;
@@ -1537,17 +1889,62 @@ function advancePlayer(card, state) {
 }
 /* #endregion */
 
-/* #region --- 效果列表 --- */
-#btn-add-action {
-    flex-shrink: 0;
-    width: auto;
+/* #region --- 抽卡條件編輯器 --- */
+#requires-modal {
+    display: flex;
+    flex-direction: column;
+    width: 44rem;
+    max-width: 95vw;
+    gap: var(--gap);
 }
 
-#actions-list .input-container > button:last-child {
-    width: 3rem;
-    min-width: 3rem;
+.requires-editor {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+}
+
+.requires-editor textarea {
+    min-height: 6rem;
+    font-size: var(--text-medium-size);
+    font-family: monospace;
+}
+
+.requires-editor [data-insert] {
+    width: auto;
     flex-shrink: 0;
+    padding: 0.5rem 0.75rem;
+}
+
+.requires-editor #requires-item-select {
+    flex: 1;
+    min-width: 0;
+}
+
+.requires-msg {
+    font-size: var(--text-small-size);
+    color: var(--text-secondary);
     padding: 0;
+    margin: 0;
+}
+
+.requires-msg.ok    { color: rgb(34, 197, 94); }
+.requires-msg.error { color: rgb(239, 68, 68); }
+
+.requires-preview {
+    font-size: var(--text-small-size);
+    color: var(--text-secondary);
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--border-radius-small);
+    background: rgba(255,255,255,0.04);
+    word-break: break-all;
+    white-space: pre-wrap;
+    min-height: 1.5rem;
+}
+
+.requires-preview.empty {
+    font-style: italic;
+    opacity: 0.5;
 }
 /* #endregion */
     </style>
@@ -1597,10 +1994,16 @@ function advancePlayer(card, state) {
     const editCardEffect     = document.getElementById("edit-card-effect");
     const editCardRarity     = document.getElementById("edit-card-rarity");
     const editIsChallenge    = document.getElementById('edit-is-challenge');
+    const btnEditRequires    = document.getElementById('btn-edit-requires');
+    const requiresModal      = document.getElementById('requires-modal');
+    const requiresExpr       = document.getElementById('requires-expr');
+    const requiresItemSelect = document.getElementById('requires-item-select');
     const actionsList        = document.getElementById('actions-list');
+    const labelAlert         = document.getElementById('card-editor-alert');
 
     var cards = {};
     var roles = [];
+    var items_list = [];
     var decks_list = {};
     var editingCard = null;
     var editingActions = [];
@@ -1659,19 +2062,23 @@ function advancePlayer(card, state) {
     btnSaveEdit.addEventListener('click', () => {
         const val = inputCardSearch.value.trim();
         if (!val) return;
+        let actionText = '儲存';
         if (!cards[val]) {
-            // 新增
+            actionText = '新增';
             cards[val] = { name: val, rarity: 1 };
             renderCard(cards[val]);
             loadCardToEditor(val);
-        } else {
-            // 儲存
-            saveEdit();
         }
+        saveEdit();
         refreshToolbar();
+        renderAlert(labelAlert, `卡牌 [${val}] ${actionText}完成`, 'green');
     });
 
-    btnDeleteCard.addEventListener('click', () => deleteCard(inputCardSearch.value.trim()));
+    btnDeleteCard.addEventListener('click', () => {
+        const name = inputItemSearch.value.trim();
+        if(deleteCard(name))
+            renderAlert(labelAlert, `卡牌 [${name}] 刪除完成`, 'red');
+    });
     // #endregion
 
     // #region --- 卡牌列表 ---
@@ -1697,7 +2104,10 @@ function advancePlayer(card, state) {
         const deleteBtn = document.createElement('button');
         deleteBtn.className = "btn-outline-red";
         deleteBtn.innerText = "刪除";
-        deleteBtn.onclick = () => deleteCard(card.name);
+        deleteBtn.onclick = () => {
+            if(deleteCard(card.name))
+                renderAlert(labelAlert, `卡牌 [${card.name}] 刪除完成`, 'red');
+        };
         btnGroup.appendChild(selectBtn);
         btnGroup.appendChild(deleteBtn);
         d.appendChild(btnGroup);
@@ -1719,6 +2129,9 @@ function advancePlayer(card, state) {
         editCardRarity.value = rarity;
         renderStarts(editCardRarityStar, rarity);
         editIsChallenge.checked = !!card.is_challenge;
+        const reqExpr = typeof card.requires === 'string' ? card.requires
+            : card.requires?.has ? card.requires.has.join(' AND ') : '';
+        setRequiresPreview(reqExpr);
 
         // 相容舊格式
         const legacy = [];
@@ -1837,7 +2250,7 @@ function advancePlayer(card, state) {
 
     function renderActionRow(action, idx) {
         const inner = document.createElement('div');
-        inner.className = 'input-container full-w';
+        inner.className = 'input-container main';
 
         const lbAction = document.createElement('label');
         inner.appendChild(lbAction);
@@ -1981,6 +2394,68 @@ function advancePlayer(card, state) {
             targetSel.addEventListener('change', () => { editingActions[idx].target = targetSel.value; });
             inner.appendChild(label);
             inner.appendChild(targetSel);
+
+        } else if (action.type === 'item_changes') {
+            lbAction.innerText = '道具';
+
+            // 相容舊格式（字串陣列）
+            const normalizeList = arr => (arr || []).map(e =>
+                typeof e === 'string' ? { item: e, count: 1 } : e);
+            editingActions[idx].give = normalizeList(action.give);
+            editingActions[idx].take = normalizeList(action.take);
+
+            // 切換按鈕：給予 / 移除
+            const modeBtn = document.createElement('button');
+            function updateModeBtn() {
+                const give = !editingActions[idx].take?.length;
+                modeBtn.textContent = give ? '給予' : '移除';
+                modeBtn.className   = give ? 'btn-primary-green' : 'btn-primary-red';
+            }
+            modeBtn.addEventListener('click', () => {
+                const a = editingActions[idx];
+                if (!a.take?.length) { a.take = a.give; a.give = []; }
+                else                 { a.give = a.take; a.take = []; }
+                updateModeBtn();
+            });
+            updateModeBtn();
+
+            const targetSel = document.createElement('select');
+            buildTargetOptions(targetSel, action.target || 'skip:0');
+            targetSel.addEventListener('change', () => { editingActions[idx].target = targetSel.value; });
+
+            // 道具下拉選單
+            const itemSel = document.createElement('select');
+            itemSel.innerHTML = '<option value="">選擇道具</option>';
+            items_list.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.name;
+                opt.textContent = item.name;
+                itemSel.appendChild(opt);
+            });
+            // 選擇後同步到 give/take（依目前模式）
+            itemSel.addEventListener('change', () => {
+                const name = itemSel.value;
+                if (!name) return;
+                const a = editingActions[idx];
+                const give = !a.take?.length;
+                const arr = give ? a.give : a.take;
+                const count = Math.max(1, parseInt(countInput.value) || 1);
+                const existing = arr.find(e => e.item === name);
+                if (existing) existing.count = count;
+                else arr.push({ item: name, count });
+                updateModeBtn();
+            });
+
+            // 數量輸入
+            const countInput = document.createElement('input');
+            countInput.type = 'number';
+            countInput.min = '1';
+            countInput.value = '1';
+
+            inner.appendChild(modeBtn);
+            inner.appendChild(targetSel);
+            inner.appendChild(itemSel);
+            inner.appendChild(countInput);
         }
 
         inner.appendChild(buildDelBtn(idx));
@@ -1991,6 +2466,85 @@ function advancePlayer(card, state) {
         actionsList.innerHTML = '';
         editingActions.forEach((action, idx) => actionsList.appendChild(renderActionRow(action, idx)));
     }
+
+    function setRequiresPreview(expr) {
+        if (expr) {
+            btnEditRequires.textContent = expr;
+            btnEditRequires.classList.remove('empty');
+        } else {
+            btnEditRequires.textContent = '（無條件）';
+            btnEditRequires.classList.add('empty');
+        }
+    }
+    document.getElementById('btn-edit-requires').addEventListener('click', () => {
+        requiresExpr.value = btnEditRequires.classList.contains('empty') ? '' : btnEditRequires.textContent;
+        updateRequiresPreview();
+        requiresModal.classList.remove('hidden');
+    });
+
+    requiresModal.querySelector('.modal-close').onclick = () => requiresModal.classList.add('hidden');
+
+    // 插入按鈕
+    requiresModal.querySelectorAll('[data-insert]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const ins = btn.dataset.insert;
+            const start = requiresExpr.selectionStart;
+            const end   = requiresExpr.selectionEnd;
+            const val   = requiresExpr.value;
+            const insert = ins === '(' || ins === ')' ? ins : ` ${ins} `;
+            requiresExpr.value = val.slice(0, start) + insert + val.slice(end);
+            requiresExpr.selectionStart = requiresExpr.selectionEnd = start + insert.length;
+            requiresExpr.focus();
+            updateRequiresPreview();
+        });
+    });
+
+    // 道具下拉插入
+    requiresItemSelect.addEventListener('change', () => {
+        const item = requiresItemSelect.value;
+        if (!item) return;
+        const start = requiresExpr.selectionStart;
+        const val   = requiresExpr.value;
+        requiresExpr.value = val.slice(0, start) + item + val.slice(start);
+        requiresExpr.selectionStart = requiresExpr.selectionEnd = start + item.length;
+        requiresExpr.focus();
+        requiresItemSelect.value = '';
+        updateRequiresPreview();
+    });
+
+    requiresExpr.addEventListener('input', updateRequiresPreview);
+
+    function updateRequiresPreview() {
+        const expr = requiresExpr.value.trim();
+        const msg = document.getElementById('requires-preview-msg');
+        if (!expr) { msg.textContent = '無條件限制'; msg.className = 'requires-msg'; return; }
+        // 簡單語法驗證：括號配對
+        let depth = 0;
+        for (const ch of expr) { if (ch === '(') depth++; else if (ch === ')') depth--; if (depth < 0) break; }
+        if (depth !== 0) { msg.textContent = '⚠ 括號不配對'; msg.className = 'requires-msg error'; }
+        else { msg.textContent = `條件：${expr}`; msg.className = 'requires-msg ok'; }
+    }
+
+    document.getElementById('btn-requires-clear').addEventListener('click', () => {
+        requiresExpr.value = '';
+        updateRequiresPreview();
+    });
+
+    document.getElementById('btn-requires-confirm').addEventListener('click', () => {
+        const expr = requiresExpr.value.trim();
+        setRequiresPreview(requiresExpr.value.trim());
+        requiresModal.classList.add('hidden');
+    });
+
+    function refreshRequiresItemSelect() {
+        requiresItemSelect.innerHTML = '<option value="">選擇道具插入</option>';
+        items_list.forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = item.name; opt.textContent = item.name;
+            requiresItemSelect.appendChild(opt);
+        });
+    }
+    // #endregion
 
     editIsChallenge.addEventListener('change', renderActionsList);
 
@@ -2009,6 +2563,8 @@ function advancePlayer(card, state) {
             editingActions.push({ type: 'change_draw_player', on: 'always', target: 'skip:1' });
         else if (type === 'change_deck')
             editingActions.push({ type: 'change_deck', on: 'always', target: Object.keys(decks_list)[0] || '' });
+        else if (type === 'item_changes')
+            editingActions.push({ type: 'item_changes', on: 'always', target: 'skip:0', give: [], take: [] });
         renderActionsList();
     });
     // #endregion
@@ -2026,6 +2582,8 @@ function advancePlayer(card, state) {
         card.effect       = editCardEffect.value.trim();
         card.rarity       = parseInt(editCardRarity.value) || 1;
         card.is_challenge = editIsChallenge.checked || undefined;
+        const reqExpr = btnEditRequires.classList.contains('empty') ? '' : btnEditRequires.textContent.trim();
+        card.requires = reqExpr || undefined;
         card.actions      = editingActions.length ? editingActions.map(a => ({ ...a })) : undefined;
         delete card.score_changes;
         delete card.score_success;
@@ -2035,8 +2593,8 @@ function advancePlayer(card, state) {
     }
 
     function deleteCard(name) {
-        if (!name || !cards[name]) return;
-        if (!confirm(`確定刪除卡牌「${name}」？`)) return;
+        if (!name || !cards[name]) return false;
+        if (!confirm(`確定刪除卡牌「${name}」？`)) return false;
         delete cards[name];
         const el = document.getElementById(`card-${name}`);
         if (el) el.remove();
@@ -2050,6 +2608,7 @@ function advancePlayer(card, state) {
         const first = Object.keys(cards)[0];
         if (first) loadCardToEditor(first);
         else { inputCardSearch.value = ''; refreshToolbar(); }
+        return true;
     }
     // #endregion
 
@@ -2060,7 +2619,7 @@ function advancePlayer(card, state) {
         cardListModal.classList.add('hidden');
         const data = await getDeckData();
         if (!data) {
-            gbCardList.innerHTML = '<p style="color:var(--primary-red); padding:var(--gap);">資料載入失敗，請至「設定」頁面匯入資料。</p>';
+            renderAlert(labelAlert, '資料載入失敗，請至「設定」頁面匯入資料。', 'red');
             return;
         }
         cards = {};
@@ -2068,12 +2627,15 @@ function advancePlayer(card, state) {
         roles = (data.roles || []).map(r => ({ name: r.name }));
         decks_list = {};
         (data.decks || []).forEach(d => { decks_list[d.name] = d; });
+        items_list = data.items || [];
+        refreshRequiresItemSelect();
         data.cards.forEach(c => { cards[c.name] = c; renderCard(c); });
 
         // 預設選第一張卡牌
         const first = Object.keys(cards)[0];
         if (first) loadCardToEditor(first);
         else refreshToolbar();
+        renderAlert(labelAlert, null, 'red');
     }
 
     initCardEditors();
@@ -2090,6 +2652,7 @@ function advancePlayer(card, state) {
         <button id="btn-edit-deck" class="btn-lg btn-primary-green disabled">新增</button>
         <button id="btn-delete-deck" class="btn-lg btn-primary-red disabled">刪除</button>
     </div>
+    <span id="deck-editor-alert" class="hidden"></span>
 
     <!-- 牌組列表 -->
     <div id="deck-list" class="scale-list-container">
@@ -2386,22 +2949,23 @@ function advancePlayer(card, state) {
     // #region --- 變數 ---
 
     // UI 控件
-    const gbButtons = document.getElementById("btn-group");
-    const inputDeckName = document.getElementById("input-deck-name");
-    const btnEditDeck = document.getElementById("btn-edit-deck");
-    const btnDeleteDeck = document.getElementById("btn-delete-deck");
-    const gbDeckList = document.getElementById("deck-list");
-    const deckEditModal = document.getElementById("decks-editor-modal");
-    const editDeckName = document.getElementById("edit-deck-name");
-    const editDeckMode = document.getElementById("edit-deck-mode");
-    const lbEditorModeTitle = document.getElementById("editor-mode-title");
-    const lbDeckTotalCount = document.getElementById("editor-total-count");
-    const editorAddButtons = document.getElementById("editor-add-buttons");
+    const gbButtons           = document.getElementById("btn-group");
+    const inputDeckName       = document.getElementById("input-deck-name");
+    const btnEditDeck         = document.getElementById("btn-edit-deck");
+    const btnDeleteDeck       = document.getElementById("btn-delete-deck");
+    const gbDeckList          = document.getElementById("deck-list");
+    const deckEditModal       = document.getElementById("decks-editor-modal");
+    const editDeckName        = document.getElementById("edit-deck-name");
+    const editDeckMode        = document.getElementById("edit-deck-mode");
+    const lbEditorModeTitle   = document.getElementById("editor-mode-title");
+    const lbDeckTotalCount    = document.getElementById("editor-total-count");
+    const editorAddButtons    = document.getElementById("editor-add-buttons");
     const editorListContainer = document.getElementById("editor-list-container");
-    const btnCancelEdit = document.getElementById("btn-cancel-edit");
-    const btnSaveEdit = document.getElementById("btn-save-edit");
-    const tabCards = document.getElementById("tab-cards");
-    const tabDecks = document.getElementById("tab-decks");
+    const btnCancelEdit       = document.getElementById("btn-cancel-edit");
+    const btnSaveEdit         = document.getElementById("btn-save-edit");
+    const tabCards            = document.getElementById("tab-cards");
+    const tabDecks            = document.getElementById("tab-decks");
+    const labelAlert          = document.getElementById('deck-editor-alert');
 
     // 資料
     var cards = [];       // 所有卡牌名稱清單
@@ -2491,7 +3055,10 @@ function advancePlayer(card, state) {
         const deleteBtn = document.createElement('button');
         deleteBtn.className = "btn-outline-red";
         deleteBtn.innerText = "刪除";
-        deleteBtn.onclick = () => deleteDeck(deck.name);
+        deleteBtn.onclick = () => {
+            if(deleteDeck(deck.name))
+                renderAlert(labelAlert, `牌組 [${deck.name}] 刪除完成`, 'red');
+        }
 
         btnGroup.appendChild(editBtn);
         btnGroup.appendChild(deleteBtn);
@@ -2514,7 +3081,9 @@ function advancePlayer(card, state) {
     }
 
     function deleteInputDeck() {
-        deleteDeck(inputDeckName.value.trim());
+        const name = inputDeckName.value.trim();
+        if(deleteDeck(name))
+            renderAlert(labelAlert, `牌組 [${val}] 刪除完成`, 'red');
     }
 
     // 開啟牌組編輯器（新增或修改）
@@ -2555,7 +3124,7 @@ function advancePlayer(card, state) {
     }
 
     function deleteDeck(deckName) {
-        if (!deckName) return;
+        if (!deckName) return false;
         if (confirm(`確定刪除牌組 ${deckName}？`)) {
             delete decks[deckName];
             const deckElement = document.getElementById(`deck-${deckName}`);
@@ -2563,7 +3132,10 @@ function advancePlayer(card, state) {
             saveDecks();
             inputDeckName.value = "";
             renderButtons();
+            return true;
         }
+
+        return false;
     }
 
     function switchVisible(deckName) {
@@ -2821,6 +3393,7 @@ function advancePlayer(card, state) {
             deckEditModal.classList.add("hidden");
         }
         editingPool = [];
+        renderAlert(labelAlert);
     }
 
     // 儲存編輯結果
@@ -2845,6 +3418,7 @@ function advancePlayer(card, state) {
         refreshDeckCount(deckName);
         saveDecks();
         closeDeckEditor();
+        renderAlert(labelAlert, `牌組 [${deckName}] 儲存完成`, 'green');
     }
     // #endregion
 
@@ -2869,7 +3443,7 @@ function advancePlayer(card, state) {
 
         const data = await getDeckData();
         if(!data) {
-            gbDeckList.innerHTML = '<p style="color:var(--primary-red); padding:var(--gap);">資料載入失敗，請至「資料備份」頁面匯入資料。</p>';
+            renderAlert(labelAlert, `資料載入失敗，請至「資料備份」頁面匯入資料。`, 'red');
             return;
         }
 
@@ -2883,6 +3457,8 @@ function advancePlayer(card, state) {
             decks[deck.name] = deck;
             renderDeck(deck);
         });
+
+        renderAlert(labelAlert);
     }
 
     initDeckEditor();
@@ -3512,6 +4088,7 @@ main {
     var cards = {};
     var decks = {};
     var roles = [];
+    var items_map = {}; // { name: { name, max_count, ... } }
     var activeDeck = null;
     var drawCounter = 1;
     var activeTimer = null;
@@ -3533,7 +4110,9 @@ main {
         get pendingScoreChanges() { return pendingScoreChanges; },
         set pendingScoreChanges(v){ pendingScoreChanges = v; },
         get decks()            { return decks; },
+        get cards()            { return cards; },
         get roles()            { return roles; },
+        get items()            { return items_map; },
         get activeDeck()       { return activeDeck; },
     };
 
@@ -3542,7 +4121,6 @@ main {
     var drawMode = ROUND_PLAYER;
     var drawModeRole = '';
     var overridePlayer = null;
-    var pendingKeepDrawer = null; // 舊格式相容，保留
     var currentDrawerIdx = 0;
     var nextUnknown = false;
     var pendingScoreChanges = [];
@@ -3602,6 +4180,7 @@ main {
             if (isNext && !isCurrent) tags.push('▶');
             if (p.role) tags.push(p.role);
             tags.push(`${p.score ?? 0} 分`);
+            if (p.items && p.items.length) tags.push(`[${p.items.join(', ')}]`);
             metaEl.textContent = tags.join(' · ');
 
             row.appendChild(nameEl);
@@ -3690,7 +4269,7 @@ main {
     document.getElementById('btn-add-player').addEventListener('click', () => { players.push({ name: '', role: '' }); renderSetupList(); });
     document.getElementById('btn-start-game').addEventListener('click', startGame);
     document.getElementById('btn-restart-game').addEventListener('click', () => {
-        currentPlayerIdx = 0; pendingKeepDrawer = null; currentDrawerIdx = 0;
+        currentPlayerIdx = 0; currentDrawerIdx = 0;
         nextUnknown = false; pendingScoreChanges = []; overridePlayer = null;
         renderSetupList(); showSetup();
     });
@@ -3964,6 +4543,8 @@ main {
         }
 
         roles = (data.roles || []).map(r => ({ name: r.name, count: r.count || 1 }));
+        items_map = {};
+        (data.items || []).forEach(i => { items_map[i.name] = i; });
         drawMode = data.player_draw_mode ?? ROUND_PLAYER;
         drawModeRole = data.player_draw_mode_role || '';
 
@@ -3990,16 +4571,16 @@ main {
     <!-- page: game_editor -->
     <template id="page-game_editor">
     <!-- 基本資訊 -->
-    <div class="input-container full-w">
+    <div class="input-container main">
         <span>標題</span>
         <input id="input-title" type="text" placeholder="遊戲標題">
     </div>
-    <div class="input-container full-w">
+    <div class="input-container main">
         <span>規則</span>
         <textarea id="input-rules" placeholder="遊戲規則說明"></textarea>
     </div>
 
-    <div class="input-container full-w">
+    <div class="input-container main">
         <span>抽卡模式</span>
         <select id="select-drawer-mode">
             <option value="0">隨機玩家</option>
@@ -4008,13 +4589,15 @@ main {
             <option value="3">指定身分輪流</option>
         </select>
         <select id="select-drawer-role" class="hidden"></select>
-        <span>身分清單</span>
-        <button id="btn-add-role" class="btn-outline-green">＋ 新增身分</button>
+        <span>身分</span>
+        <input id="input-role"></input>
+        <button id="btn-add-role" class="btn-outline-green">＋ 新增</button>
     </div>
-    <div id="role-list"></div>
-
+    <span id="role-editor-alert" class="hidden"></span>
+    <div id="role-list" class="glass-card scale-list-container"></div>
     <!-- 操作按鈕 -->
-    <div class="input-container full-w">
+    <span id="data-editor-alert" class="hidden"></span>
+    <div class="input-container main">
         <button id="btn-save" class="btn-lg btn-primary-green">儲存</button>
         <button id="btn-export" class="btn-lg btn-primary-dark">匯出</button>
         <button id="btn-import" class="btn-lg btn-primary-dark">匯入</button>
@@ -4023,37 +4606,35 @@ main {
     <input type="file" id="import-input" class="hidden" accept=".json">
     </template>
     <style id="style-game_editor">
-main {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    overflow: hidden;
-    padding-top: 0;
-    padding: var(--gap);
-    gap: var(--gap);
-    overflow-y: auto;
-    max-width: 48rem;
-    margin: 0 auto;
-}
-
 /* 基本資訊 */
-#input-rules {
-    min-height: 15rem;
+#role-list {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    padding: var(--gap) 2rem;
+    gap: var(--gap);
+    max-height: 90vh;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    align-items: start;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
-.input-container.role-row,
-.input-container.role-row > input[type="text"] {
+#role-list > .input-container {
+    min-width: 15rem;
+}
+
+#role-list > .input-container > span {
+    width: 100%;
+    text-align: center;
+}
+
+.input-container.main > .btn-lg {
     width: 100%;
 }
 
-.input-container.role-row > button {
-    width: 3rem;
-}
-
-.input-container.role-row > input[type="number"] {
-    width: 5rem;
-    text-align: center;
-}
 /* 提示文字 */
 .hint-ok  { color: rgb(34, 197, 94);  font-size: var(--text-small-size); padding: 0; margin: 0; }
 .hint-err { color: rgb(239, 68, 68);  font-size: var(--text-small-size); padding: 0; margin: 0; }
@@ -4085,89 +4666,116 @@ main {
     const selectDrawerMode = document.getElementById('select-drawer-mode');
     const selectDrawerRole = document.getElementById('select-drawer-role');
     const roleListEl       = document.getElementById('role-list');
+    const roleAlert       = document.getElementById('role-editor-alert');
+    const dataAlert       = document.getElementById('data-editor-alert');
     // #endregion
 
-    // 需要指定身分的模式
     const DIGNITY_MODES = new Set([2, 3]);
 
-    // #region --- 身分清單 ---
-    var editingRoles = [];
+    // #region --- 身分清單（字典） ---
+    // editingRoles: { [name]: { count: number } }
+    var editingRoles = {};
 
     function refreshDrawerRoleSelect(selectedName) {
         const isDignityMode = DIGNITY_MODES.has(parseInt(selectDrawerMode.value));
         selectDrawerRole.classList.toggle('hidden', !isDignityMode);
         if (!isDignityMode) return;
-
         selectDrawerRole.innerHTML = '';
-        editingRoles.forEach(r => {
+        Object.keys(editingRoles).forEach(name => {
             const opt = document.createElement('option');
-            opt.value = r.name;
-            opt.textContent = r.name || '（未命名）';
-            if (r.name === selectedName) opt.selected = true;
+            opt.value = name;
+            opt.textContent = name;
+            if (name === selectedName) opt.selected = true;
             selectDrawerRole.appendChild(opt);
         });
     }
 
+    // 渲染單筆身分列，append 到 roleListEl
+    function renderRole(name, role) {
+        const row = document.createElement('div');
+        row.className = 'input-container';
+        row.dataset.roleName = name;
+
+        const nameLabel = document.createElement('span');
+        nameLabel.innerText = name;
+
+        const cMinus = document.createElement('button');
+        cMinus.className = 'btn-outline-dark';
+        cMinus.textContent = '−';
+
+        const countInput = document.createElement('input');
+        countInput.type = 'number';
+        countInput.min  = 1;
+        countInput.value = role.count;
+        countInput.addEventListener('change', () => {
+            const v = parseInt(countInput.value);
+            editingRoles[name].count = isNaN(v) || v < 1 ? 1 : v;
+            countInput.value = editingRoles[name].count;
+        });
+
+        cMinus.addEventListener('click', () => {
+            if (editingRoles[name].count > 1) {
+                editingRoles[name].count--;
+                countInput.value = editingRoles[name].count;
+            } else {
+                renderAlert(roleAlert, `身分「${name}」數量最少為 1，如需移除請按 ✕`, 'gray');
+            }
+        });
+
+        const cPlus = document.createElement('button');
+        cPlus.className = 'btn-outline-blue';
+        cPlus.textContent = '+';
+        cPlus.addEventListener('click', () => {
+            editingRoles[name].count++;
+            countInput.value = editingRoles[name].count;
+            renderAlert(roleAlert);
+        });
+
+        const btnDel = document.createElement('button');
+        btnDel.className = 'btn-outline-red';
+        btnDel.textContent = '✕';
+        btnDel.addEventListener('click', () => {
+            delete editingRoles[name];
+            row.remove();
+            refreshDrawerRoleSelect(selectDrawerRole.value);
+            renderAlert(roleAlert, `已刪除身分「${name}」`, 'red');
+        });
+
+        [nameLabel, cMinus, countInput, cPlus, btnDel].forEach(c => row.appendChild(c));
+        roleListEl.appendChild(row);
+    }
+
     function renderRoleList() {
         roleListEl.innerHTML = '';
-        editingRoles.forEach((role, idx) => {
-            const row = document.createElement('div');
-            row.className = 'input-container role-row';
-
-            const nameLabel = document.createElement('span');
-            nameLabel.innerText = '身分';
-
-            const nameInput = document.createElement('input');
-            nameInput.type = 'text';
-            nameInput.placeholder = '身分名稱';
-            nameInput.value = role.name;
-            nameInput.addEventListener('input', () => {
-                editingRoles[idx].name = nameInput.value;
-                refreshDrawerRoleSelect(selectDrawerRole.value);
-            });
-
-            const countInput = document.createElement('input');
-            countInput.type = 'number';
-            countInput.min  = 1;
-            countInput.value = role.count;
-            countInput.addEventListener('change', () => {
-                const v = parseInt(countInput.value);
-                editingRoles[idx].count = isNaN(v) || v < 1 ? 1 : v;
-                countInput.value = editingRoles[idx].count;
-            });
-
-            const cMinus = document.createElement('button');
-            cMinus.className = 'btn-outline-dark';
-            cMinus.textContent = '−';
-            cMinus.addEventListener('click', () => {
-                if (editingRoles[idx].count > 1) {
-                    editingRoles[idx].count--;
-                    countInput.value = editingRoles[idx].count;
-                }
-            });
-
-            const cPlus = document.createElement('button');
-            cPlus.className = 'btn-outline-blue';
-            cPlus.textContent = '+';
-            cPlus.addEventListener('click', () => {
-                editingRoles[idx].count++;
-                countInput.value = editingRoles[idx].count;
-            });
-
-            const btnDel = document.createElement('button');
-            btnDel.className = 'btn-outline-red';
-            btnDel.textContent = '✕';
-            btnDel.addEventListener('click', () => {
-                editingRoles.splice(idx, 1);
-                renderRoleList();
-                refreshDrawerRoleSelect(selectDrawerRole.value);
-            });
-
-            [nameLabel, nameInput, cMinus, countInput, cPlus, btnDel].forEach(c => row.appendChild(c));
-            roleListEl.appendChild(row);
-        });
+        Object.entries(editingRoles).forEach(([name, role]) => renderRole(name, role));
         refreshDrawerRoleSelect(selectDrawerRole.value);
     }
+    // #endregion
+
+    // #region --- 新增身分 ---
+    const inputRole = document.getElementById('input-role');
+
+    function addRole() {
+        const name = inputRole.value.trim();
+        if (!name) {
+            renderAlert(roleAlert, '請輸入身分名稱', 'red');
+            inputRole.focus();
+            return;
+        }
+        if (editingRoles[name]) {
+            renderAlert(roleAlert, `身分「${name}」已存在`, 'red');
+            inputRole.focus();
+            return;
+        }
+        editingRoles[name] = { count: 1 };
+        renderRole(name, editingRoles[name]);
+        refreshDrawerRoleSelect(selectDrawerRole.value);
+        inputRole.value = '';
+        renderAlert(roleAlert, `身分「${name}」新增完成`, 'green');
+    }
+
+    document.getElementById('btn-add-role').addEventListener('click', addRole);
+    inputRole.addEventListener('keydown', e => { if (e.key === 'Enter') addRole(); });
     // #endregion
 
     // #region --- 載入 ---
@@ -4177,13 +4785,12 @@ main {
 
         inputTitle.value = data.title || '';
         inputRules.value = data.rules || '';
-
         selectDrawerMode.value = String(data.player_draw_mode ?? 1);
 
-        editingRoles = (data.roles || []).map(r => ({
-            name:  r.name  || '',
-            count: r.count || 1,
-        }));
+        editingRoles = {};
+        (data.roles || []).forEach(r => {
+            if (r.name) editingRoles[r.name] = { count: r.count || 1 };
+        });
         renderRoleList();
         refreshDrawerRoleSelect(data.player_draw_mode_role || '');
     }
@@ -4192,32 +4799,28 @@ main {
     // #region --- 儲存 ---
     async function save() {
         const title = inputTitle.value.trim();
-        if (!title) { alert('標題不能為空'); return; }
-        for (const r of editingRoles) {
-            if (!r.name.trim()) { alert('身分名稱不能為空'); return; }
+        if (!title) {
+            renderAlert(dataAlert, '請輸入標題', 'red');
+            inputTitle.focus();
+            return;
         }
-
         const drawerMode = parseInt(selectDrawerMode.value);
         const data = await getDeckData();
-        data.title                = title;
-        data.rules                = inputRules.value;
-        data.player_draw_mode     = drawerMode;
+        data.title                 = title;
+        data.rules                 = inputRules.value;
+        data.player_draw_mode      = drawerMode;
         data.player_draw_mode_role = DIGNITY_MODES.has(drawerMode) ? selectDrawerRole.value : '';
-        data.roles                = editingRoles.map(r => ({ name: r.name.trim(), count: r.count }));
+        data.roles = Object.entries(editingRoles).map(([name, r]) => ({ name, count: r.count }));
         setStorageData(data);
         renderTitle(title);
-        alert('已儲存');
+        renderAlert(dataAlert, `遊戲「${title}」儲存完成`, 'green');
     }
     // #endregion
 
     // #region --- 事件綁定 ---
     selectDrawerMode.addEventListener('change', () => {
         refreshDrawerRoleSelect(selectDrawerRole.value);
-    });
-
-    document.getElementById('btn-add-role').addEventListener('click', () => {
-        editingRoles.push({ name: '', count: 1 });
-        renderRoleList();
+        renderAlert(dataAlert);
     });
 
     document.getElementById('btn-save').addEventListener('click', save);
@@ -4230,6 +4833,7 @@ main {
         a.href = URL.createObjectURL(b);
         a.download = data.title + '.json';
         a.click();
+        renderAlert(dataAlert, `已匯出遊戲「${data.title}」`, 'green');
     });
 
     document.getElementById('btn-import').addEventListener('click', () => {
@@ -4241,12 +4845,18 @@ main {
         r.onload = async (ev) => {
             let data;
             try { data = JSON.parse(ev.target.result); }
-            catch { alert('匯入失敗：檔案不是有效的 JSON 格式'); return; }
+            catch {
+                renderAlert(dataAlert, '匯入失敗：不是有效的 JSON 格式', 'red');
+                return;
+            }
             const err = validateDeckData(data);
-            if (err) { alert(`匯入失敗：${err}`); return; }
+            if (err) {
+                renderAlert(dataAlert, `匯入失敗：${err}`, 'red');
+                return;
+            }
             setStorageData(ev.target.result);
             await load();
-            alert(`已匯入「${data.title}」，共 ${data.cards.length} 張卡牌、${data.decks.length} 個牌組`);
+            renderAlert(dataAlert, `已匯入「${data.title}」，共 ${data.cards.length} 張卡牌、${data.decks.length} 個牌組`, 'green');
         };
         r.readAsText(e.target.files[0]);
         e.target.value = '';
@@ -4264,12 +4874,287 @@ main {
 
 })();
     </script>
+
+    <!-- page: item_editor -->
+    <template id="page-item_editor">
+    <!-- 道具編輯器 -->
+    <div id="btn-group" class="input-container main">
+        <button id="select-item-btn" class="btn-lg btn-primary-dark">道具列表</button>
+        <div class="combobox-wrap">
+            <input id="input-item-search" type="text" placeholder="搜尋或輸入新道具名稱" autocomplete="off">
+            <ul id="item-dropdown" class="card-dropdown hidden"></ul>
+        </div>
+        <button id="btn-save-item" class="btn-lg btn-primary-green">儲存</button>
+        <button id="btn-delete-item" class="btn-lg btn-primary-red disabled">刪除</button>
+    </div>
+    <span id="item-editor-alert" class="hidden"></span>
+    <h2 id="edit-item-name">道具</h2>
+    <div class="input-container main">
+        <label for="edit-item-max">可持有數量</label>
+        <input id="edit-item-max" type="number" min="1" value="1" placeholder="1">
+    </div>
+
+    <div class="input-container main">
+        <label for="edit-item-desc">描述</label>
+        <textarea id="edit-item-desc" placeholder="描述道具效果(保留功能)"></textarea>
+    </div>
+
+    <div id="item-editor-modal" class="pop-modal hidden">
+        <button class="modal-close" aria-label="關閉">✕</button>
+        <h2>道具列表</h2>
+        <div id="item-prototype-list" class="scale-list-container"></div>
+    </div>
+    </template>
+    <style id="style-item_editor">
+/* 道具編輯器沿用 card_editor 的 editor-card 樣式 */
+#item-prototype-list {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    padding: var(--gap) 2rem;
+    gap: var(--gap);
+    max-height: 80vh;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    align-items: start;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+#item-prototype-list > .glass-card {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 5rem;
+    gap: var(--gap-small);
+    margin: 0;
+    border-radius: var(--border-radius-medium);
+    box-sizing: border-box;
+}
+
+#item-prototype-list > .glass-card > .input-container,
+#item-prototype-list > .glass-card > .input-container > button {
+    width: 10rem;
+}
+
+#item-editor-modal {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    min-width: 40rem;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+    </style>
+    <script type="text/template" id="script-item_editor">
+(function() {
+    // #region --- 變數 ---
+    const inputItemSearch = document.getElementById('input-item-search');
+    const itemDropdown    = document.getElementById('item-dropdown');
+    const btnSaveItem     = document.getElementById('btn-save-item');
+    const btnDeleteItem   = document.getElementById('btn-delete-item');
+    const btnList         = document.getElementById('select-item-btn');
+    const gbItemList      = document.getElementById('item-prototype-list');
+    const itemListModal   = document.getElementById('item-editor-modal');
+    const editItemName    = document.getElementById('edit-item-name');
+    const editItemDesc    = document.getElementById('edit-item-desc');
+    const editItemMax     = document.getElementById('edit-item-max');
+    const labelAlert      = document.getElementById('item-editor-alert');
+
+    var items = {};       // { name: { name, description, max_count, properties } }
+    var editingItem = null;
+    // #endregion
+
+    // #region --- 工具列 ---
+    function refreshToolbar() {
+        const val = inputItemSearch.value.trim();
+        const exists = !!items[val];
+        const isNew = val && !exists;
+        btnSaveItem.classList.toggle('disabled', !val);
+        btnSaveItem.textContent = isNew ? '新增' : '儲存';
+        btnSaveItem.classList.remove('btn-primary-green', 'btn-primary-blue');
+        btnSaveItem.classList.add(isNew ? 'btn-primary-green' : 'btn-primary-blue');
+        btnDeleteItem.classList.toggle('disabled', !exists);
+    }
+
+    function updateDropdown(forceAll) {
+        const query = forceAll ? '' : inputItemSearch.value.trim().toLowerCase();
+        const names = Object.keys(items).filter(n => !query || n.toLowerCase().includes(query));
+        itemDropdown.innerHTML = '';
+        if (!names.length) { itemDropdown.classList.add('hidden'); return; }
+        names.forEach(name => {
+            const li = document.createElement('li');
+            li.textContent = name;
+            li.addEventListener('mousedown', e => {
+                e.preventDefault();
+                inputItemSearch.value = name;
+                hideDropdown();
+                loadItemToEditor(name);
+                renderAlert(labelAlert);
+            });
+            itemDropdown.appendChild(li);
+        });
+        itemDropdown.classList.remove('hidden');
+    }
+
+    function hideDropdown() { itemDropdown.classList.add('hidden'); }
+
+    inputItemSearch.addEventListener('input', () => { updateDropdown(false); refreshToolbar(); });
+    inputItemSearch.addEventListener('focus', () => { inputItemSearch.select(); updateDropdown(true); });
+    inputItemSearch.addEventListener('blur', () => setTimeout(hideDropdown, 150));
+    inputItemSearch.addEventListener('keypress', e => { if (e.key === 'Enter') btnSaveItem.click(); });
+
+    btnList.addEventListener('click', () => itemListModal.classList.remove('hidden'));
+    itemListModal.querySelector('.modal-close').onclick = () => itemListModal.classList.add('hidden');
+
+    btnSaveItem.addEventListener('click', () => {
+        const val = inputItemSearch.value.trim();
+        if (!val) return;
+        let actionText = '儲存';
+        if (!items[val]) {
+            actionText = '新增';
+            items[val] = { name: val, max_count: 1 };
+            renderItemCard(items[val]);
+            loadItemToEditor(val);
+        }
+
+        saveEdit();
+        refreshToolbar();
+
+        renderAlert(labelAlert, `道具 [${val}] ${actionText}完成`, 'green');
+    });
+
+    btnDeleteItem.addEventListener('click', () => {
+        const name = inputItemSearch.value.trim();
+        if(deleteItem(name))
+            renderAlert(labelAlert, `道具 [${name}] 刪除完成`, 'red');
+    });
+    // #endregion
+
+    // #region --- 道具列表 ---
+    function renderItemCard(item) {
+        const existing = document.getElementById(`item-${item.name}`);
+        if (existing) {
+            existing.querySelector('.item-card-max').textContent = `上限：${item.max_count ?? 1}`;
+            return;
+        }
+        const d = document.createElement('div');
+        d.id = `item-${item.name}`;
+        d.className = 'glass-card';
+        d.innerHTML = `<div class="card-info">
+            <p class="item-card-max" style="font-size:var(--text-small-size);color:var(--text-secondary)">上限：${item.max_count ?? 1}</p>
+            <p>${item.name}</p>
+        </div>`;
+        const btnGroup = document.createElement('div');
+        btnGroup.className = 'input-container';
+        const selectBtn = document.createElement('button');
+        selectBtn.className = 'btn-outline-blue';
+        selectBtn.innerText = '選擇';
+        selectBtn.onclick = () => {
+            loadItemToEditor(item.name);
+            itemListModal.classList.add('hidden');
+            renderAlert(labelAlert);
+        };
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn-outline-red';
+        deleteBtn.innerText = '刪除';
+        deleteBtn.onclick = () => {
+            if(deleteItem(item.name))
+                renderAlert(labelAlert, `道具 [${card.name}] 刪除完成`, 'red');
+        };
+        btnGroup.appendChild(selectBtn);
+        btnGroup.appendChild(deleteBtn);
+        d.appendChild(btnGroup);
+        gbItemList.appendChild(d);
+    }
+    // #endregion
+
+    // #region --- 編輯區 ---
+    function loadItemToEditor(name) {
+        const item = items[name];
+        if (!item) return;
+        editingItem = name;
+        inputItemSearch.value = name;
+        refreshToolbar();
+        editItemName.textContent = item.name;
+        editItemDesc.value = item.description || '';
+        editItemMax.value = item.max_count ?? 1;
+    }
+
+    function saveEdit() {
+        if (!editingItem) return;
+        const item = items[editingItem];
+        item.description = editItemDesc.value.trim() || undefined;
+        item.max_count   = parseInt(editItemMax.value) || 1;
+        renderItemCard(item);
+        saveItems();
+    }
+
+    function deleteItem(name) {
+        if (!name || !items[name]) return false;
+        if (!confirm(`確定刪除道具「${name}」？`)) return false;
+        delete items[name];
+        const el = document.getElementById(`item-${name}`);
+        if (el) el.remove();
+        saveItems();
+        if (editingItem === name) {
+            editingItem = null;
+            editItemName.textContent = '道具';
+            editItemDesc.value = '';
+            editItemMax.value = 1;
+        }
+        const first = Object.keys(items)[0];
+        if (first) loadItemToEditor(first);
+        else { inputItemSearch.value = ''; refreshToolbar(); }
+        return true;
+    }
+    // #endregion
+
+    // #region --- 儲存 ---
+    async function saveItems() {
+        const data = await getDeckData();
+        if (!data) return;
+        data.items = Object.values(items).map(i => {
+            const obj = { name: i.name, max_count: i.max_count ?? 1 };
+            if (i.description) obj.description = i.description;
+            if (i.properties && Object.keys(i.properties).length) obj.properties = i.properties;
+            return obj;
+        });
+        setStorageData(data);
+    }
+    // #endregion
+
+    // #region --- 初始化 ---
+    async function initItemEditor() {
+        renderTitle('道具編輯器');
+        itemListModal.classList.add('hidden');
+        const data = await getDeckData();
+        if (!data) {
+            renderAlert(labelAlert, '資料載入失敗。', 'red');
+            return;
+        }
+        items = {};
+        gbItemList.innerHTML = '';
+        (data.items || []).forEach(i => { items[i.name] = { ...i }; renderItemCard(items[i.name]); });
+        const first = Object.keys(items)[0];
+        if (first) loadItemToEditor(first);
+        else refreshToolbar();
+        renderAlert(labelAlert);
+    }
+
+    initItemEditor();
+    // #endregion
+})();
+    </script>
     <script>
 /* index.js */
 // #region --- 變數 ---
 const pages = {
     game: {
         title: "首頁"
+    },
+    item_editor: {
+        title: "道具編輯器"
     },
     card_editor: {
         title: "卡牌編輯器",

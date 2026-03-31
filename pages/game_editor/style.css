@@ -1,34 +1,33 @@
-main {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    overflow: hidden;
-    padding-top: 0;
-    padding: var(--gap);
-    gap: var(--gap);
-    overflow-y: auto;
-    max-width: 48rem;
-    margin: 0 auto;
-}
 
 /* 基本資訊 */
-#input-rules {
-    min-height: 15rem;
+#role-list {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    padding: var(--gap) 2rem;
+    gap: var(--gap);
+    max-height: 90vh;
+    
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    align-items: start;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
-.input-container.role-row,
-.input-container.role-row > input[type="text"] {
+#role-list > .input-container {
+    min-width: 15rem;
+}
+
+#role-list > .input-container > span {
+    width: 100%;
+    text-align: center;
+}
+
+.input-container.main > .btn-lg {
     width: 100%;
 }
 
-.input-container.role-row > button {
-    width: 3rem;
-}
-
-.input-container.role-row > input[type="number"] {
-    width: 5rem;
-    text-align: center;
-}
 /* 提示文字 */
 .hint-ok  { color: rgb(34, 197, 94);  font-size: var(--text-small-size); padding: 0; margin: 0; }
 .hint-err { color: rgb(239, 68, 68);  font-size: var(--text-small-size); padding: 0; margin: 0; }

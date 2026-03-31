@@ -1,0 +1,39 @@
+/* 道具編輯器沿用 card_editor 的 editor-card 樣式 */
+#item-prototype-list {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    padding: var(--gap) 2rem;
+    gap: var(--gap);
+    max-height: 80vh;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    align-items: start;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+#item-prototype-list > .glass-card {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 5rem;
+    gap: var(--gap-small);
+    margin: 0;
+    border-radius: var(--border-radius-medium);
+    box-sizing: border-box;
+}
+
+#item-prototype-list > .glass-card > .input-container,
+#item-prototype-list > .glass-card > .input-container > button {
+    width: 10rem;
+}
+
+#item-editor-modal {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    min-width: 40rem;
+    max-height: 90vh;
+    overflow-y: auto;
+}

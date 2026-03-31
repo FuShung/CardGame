@@ -1,0 +1,74 @@
+/* ================================================
+   Alert Label（狀態提示標籤）
+   ================================================ */
+
+.alert-blue,
+.alert-green,
+.alert-red,
+.alert-gray,
+.alert-dark,
+p.alert-blue,
+p.alert-green,
+p.alert-red,
+p.alert-gray,
+p.alert-dark,
+label.alert-blue,
+label.alert-green,
+label.alert-red,
+label.alert-gray,
+label.alert-dark,
+span.alert-blue,
+span.alert-green,
+span.alert-red,
+span.alert-gray,
+span.alert-dark
+{
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: var(--gap);
+    padding: var(--gap-small);
+    border-radius: var(--border-radius-medium);
+    font-size: var(--text-large-size);
+    letter-spacing: 0.05em;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+}
+
+.alert-blue {
+    color: rgb(147, 197, 253);
+    background-color: rgba(37, 99, 235, 0.2);
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: var(--shadow-size) var(--primary-blue-shadow);
+}
+
+.alert-green {
+    color: rgb(134, 239, 172);
+    background-color: rgba(21, 128, 61, 0.2);
+    border-color: rgba(34, 197, 94, 0.4);
+    box-shadow: var(--shadow-size) var(--primary-green-shadow);
+}
+
+.alert-red {
+    color: rgb(252, 165, 165);
+    background-color: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+    box-shadow: var(--shadow-size) var(--primary-red-shadow);
+}
+
+.alert-gray {
+    color: rgb(203, 213, 225);
+    background-color: rgba(71, 85, 105, 0.25);
+    border-color: rgba(71, 85, 105, 0.5);
+    box-shadow: var(--shadow-size) var(--primary-gray-shadow);
+}
+
+.alert-dark {
+    color: var(--text-secondary);
+    background-color: rgba(30, 41, 59, 0.4);
+    border-color: var(--border-color);
+    box-shadow: var(--shadow-size) var(--primary-dark-shadow);
+}

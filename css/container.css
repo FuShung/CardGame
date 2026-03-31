@@ -1,0 +1,126 @@
+/* ================================================
+   列表容器
+   ================================================ */
+
+.list-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--gap);
+    overflow-y: auto;
+    max-height: 80vh;
+    padding: var(--gap);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.scale-list-container {
+    display: grid;
+    /* auto-fill 根據容器實際可用寬度決定欄數，不依賴視窗斷點 */
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    gap: var(--gap);
+    align-items: start;         /* 各格高度獨立，不互相撐高 */
+    overflow-y: auto;
+    max-height: 80vh;
+    padding: var(--gap);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.vec-list-container {
+    display: flex;
+    flex-direction:column;
+    flex-wrap: wrap;
+    gap: var(--gap);
+    width: 100%;
+    min-width: var(--body-width);
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* ================================================
+   輸入容器
+   ================================================ */
+
+.input-container {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-small);
+    margin: var(--gap-small);
+    width: fit-content;
+    text-wrap: nowrap;
+    font-size: var(--text-large-size);
+    color: var(--text-primary);
+}
+
+p.main,
+span.main,
+label.main,
+.input-container.main {
+    min-width: var(--body-width);
+}
+
+.input-container > label,
+.input-container > span,
+.input-container > p {
+    font-size: var(--text-large-size);
+    background-color: var(--border-color);
+    padding: 0.5rem 1.5rem;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+.input-container > button,
+.input-container > a,
+.input-container > select,
+.input-container > input {
+    border-radius: var(--border-radius-small);
+    margin: 0;
+}
+
+.input-container > :first-child {
+    border-top-left-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+}
+
+.input-container > :last-child {
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
+
+/* 繼承 input-container 首尾圓角規則 */
+.input-container > .combobox-wrap:first-child > input {
+    border-top-left-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+}
+
+.input-container > .combobox-wrap:last-child > input {
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
+
+div.full-w {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+p.full-w,
+label.full-w,
+span.full-w {
+    width: 100%;
+}
+
+button.full-w,
+select.full-w,
+input.full-w,
+.input-container.full-w,
+.input-container.full-w > button,
+.input-container.full-w > select,
+.input-container.full-w > input {
+    width: 100%;
+}

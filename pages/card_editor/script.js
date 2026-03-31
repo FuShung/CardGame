@@ -12,10 +12,16 @@
     const editCardEffect     = document.getElementById("edit-card-effect");
     const editCardRarity     = document.getElementById("edit-card-rarity");
     const editIsChallenge    = document.getElementById('edit-is-challenge');
+    const btnEditRequires    = document.getElementById('btn-edit-requires');
+    const requiresModal      = document.getElementById('requires-modal');    
+    const requiresExpr       = document.getElementById('requires-expr');
+    const requiresItemSelect = document.getElementById('requires-item-select');
     const actionsList        = document.getElementById('actions-list');
+    const labelAlert         = document.getElementById('card-editor-alert');
 
     var cards = {};
     var roles = [];
+    var items_list = [];
     var decks_list = {};
     var editingCard = null;
     var editingActions = [];
@@ -74,19 +80,23 @@
     btnSaveEdit.addEventListener('click', () => {
         const val = inputCardSearch.value.trim();
         if (!val) return;
+        let actionText = '儲存';
         if (!cards[val]) {
-            // 新增
+            actionText = '新增';
             cards[val] = { name: val, rarity: 1 };
             renderCard(cards[val]);
             loadCardToEditor(val);
-        } else {
-            // 儲存
-            saveEdit();
-        }
+        } 
+        saveEdit();
         refreshToolbar();
+        renderAlert(labelAlert, `卡牌 [${val}] ${actionText}完成`, 'green');
     });
 
-    btnDeleteCard.addEventListener('click', () => deleteCard(inputCardSearch.value.trim()));
+    btnDeleteCard.addEventListener('click', () => {
+        const name = inputItemSearch.value.trim();
+        if(deleteCard(name))
+            renderAlert(labelAlert, `卡牌 [${name}] 刪除完成`, 'red');
+    });
     // #endregion
 
     // #region --- 卡牌列表 ---
@@ -112,7 +122,10 @@
         const deleteBtn = document.createElement('button');
         deleteBtn.className = "btn-outline-red";
         deleteBtn.innerText = "刪除";
-        deleteBtn.onclick = () => deleteCard(card.name);
+        deleteBtn.onclick = () => { 
+            if(deleteCard(card.name))
+                renderAlert(labelAlert, `卡牌 [${card.name}] 刪除完成`, 'red');
+        };
         btnGroup.appendChild(selectBtn);
         btnGroup.appendChild(deleteBtn);
         d.appendChild(btnGroup);
@@ -134,6 +147,9 @@
         editCardRarity.value = rarity;
         renderStarts(editCardRarityStar, rarity);
         editIsChallenge.checked = !!card.is_challenge;
+        const reqExpr = typeof card.requires === 'string' ? card.requires
+            : card.requires?.has ? card.requires.has.join(' AND ') : '';
+        setRequiresPreview(reqExpr);
 
         // 相容舊格式
         const legacy = [];
@@ -252,7 +268,7 @@
 
     function renderActionRow(action, idx) {
         const inner = document.createElement('div');
-        inner.className = 'input-container full-w';
+        inner.className = 'input-container main';
 
         const lbAction = document.createElement('label');
         inner.appendChild(lbAction);
@@ -396,6 +412,68 @@
             targetSel.addEventListener('change', () => { editingActions[idx].target = targetSel.value; });
             inner.appendChild(label);
             inner.appendChild(targetSel);
+
+        } else if (action.type === 'item_changes') {
+            lbAction.innerText = '道具';
+
+            // 相容舊格式（字串陣列）
+            const normalizeList = arr => (arr || []).map(e =>
+                typeof e === 'string' ? { item: e, count: 1 } : e);
+            editingActions[idx].give = normalizeList(action.give);
+            editingActions[idx].take = normalizeList(action.take);
+
+            // 切換按鈕：給予 / 移除
+            const modeBtn = document.createElement('button');
+            function updateModeBtn() {
+                const give = !editingActions[idx].take?.length;
+                modeBtn.textContent = give ? '給予' : '移除';
+                modeBtn.className   = give ? 'btn-primary-green' : 'btn-primary-red';
+            }
+            modeBtn.addEventListener('click', () => {
+                const a = editingActions[idx];
+                if (!a.take?.length) { a.take = a.give; a.give = []; }
+                else                 { a.give = a.take; a.take = []; }
+                updateModeBtn();
+            });
+            updateModeBtn();
+
+            const targetSel = document.createElement('select');
+            buildTargetOptions(targetSel, action.target || 'skip:0');
+            targetSel.addEventListener('change', () => { editingActions[idx].target = targetSel.value; });
+
+            // 道具下拉選單
+            const itemSel = document.createElement('select');
+            itemSel.innerHTML = '<option value="">選擇道具</option>';
+            items_list.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.name;
+                opt.textContent = item.name;
+                itemSel.appendChild(opt);
+            });
+            // 選擇後同步到 give/take（依目前模式）
+            itemSel.addEventListener('change', () => {
+                const name = itemSel.value;
+                if (!name) return;
+                const a = editingActions[idx];
+                const give = !a.take?.length;
+                const arr = give ? a.give : a.take;
+                const count = Math.max(1, parseInt(countInput.value) || 1);
+                const existing = arr.find(e => e.item === name);
+                if (existing) existing.count = count;
+                else arr.push({ item: name, count });
+                updateModeBtn();
+            });
+
+            // 數量輸入
+            const countInput = document.createElement('input');
+            countInput.type = 'number';
+            countInput.min = '1';
+            countInput.value = '1';
+
+            inner.appendChild(modeBtn);
+            inner.appendChild(targetSel);
+            inner.appendChild(itemSel);
+            inner.appendChild(countInput);
         }
 
         inner.appendChild(buildDelBtn(idx));
@@ -406,6 +484,85 @@
         actionsList.innerHTML = '';
         editingActions.forEach((action, idx) => actionsList.appendChild(renderActionRow(action, idx)));
     }
+
+    function setRequiresPreview(expr) {
+        if (expr) {
+            btnEditRequires.textContent = expr;
+            btnEditRequires.classList.remove('empty');
+        } else {
+            btnEditRequires.textContent = '（無條件）';
+            btnEditRequires.classList.add('empty');
+        }
+    }
+    document.getElementById('btn-edit-requires').addEventListener('click', () => {
+        requiresExpr.value = btnEditRequires.classList.contains('empty') ? '' : btnEditRequires.textContent;
+        updateRequiresPreview();
+        requiresModal.classList.remove('hidden');
+    });
+
+    requiresModal.querySelector('.modal-close').onclick = () => requiresModal.classList.add('hidden');
+
+    // 插入按鈕
+    requiresModal.querySelectorAll('[data-insert]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const ins = btn.dataset.insert;
+            const start = requiresExpr.selectionStart;
+            const end   = requiresExpr.selectionEnd;
+            const val   = requiresExpr.value;
+            const insert = ins === '(' || ins === ')' ? ins : ` ${ins} `;
+            requiresExpr.value = val.slice(0, start) + insert + val.slice(end);
+            requiresExpr.selectionStart = requiresExpr.selectionEnd = start + insert.length;
+            requiresExpr.focus();
+            updateRequiresPreview();
+        });
+    });
+
+    // 道具下拉插入
+    requiresItemSelect.addEventListener('change', () => {
+        const item = requiresItemSelect.value;
+        if (!item) return;
+        const start = requiresExpr.selectionStart;
+        const val   = requiresExpr.value;
+        requiresExpr.value = val.slice(0, start) + item + val.slice(start);
+        requiresExpr.selectionStart = requiresExpr.selectionEnd = start + item.length;
+        requiresExpr.focus();
+        requiresItemSelect.value = '';
+        updateRequiresPreview();
+    });
+
+    requiresExpr.addEventListener('input', updateRequiresPreview);
+
+    function updateRequiresPreview() {
+        const expr = requiresExpr.value.trim();
+        const msg = document.getElementById('requires-preview-msg');
+        if (!expr) { msg.textContent = '無條件限制'; msg.className = 'requires-msg'; return; }
+        // 簡單語法驗證：括號配對
+        let depth = 0;
+        for (const ch of expr) { if (ch === '(') depth++; else if (ch === ')') depth--; if (depth < 0) break; }
+        if (depth !== 0) { msg.textContent = '⚠ 括號不配對'; msg.className = 'requires-msg error'; }
+        else { msg.textContent = `條件：${expr}`; msg.className = 'requires-msg ok'; }
+    }
+
+    document.getElementById('btn-requires-clear').addEventListener('click', () => {
+        requiresExpr.value = '';
+        updateRequiresPreview();
+    });
+
+    document.getElementById('btn-requires-confirm').addEventListener('click', () => {
+        const expr = requiresExpr.value.trim();
+        setRequiresPreview(requiresExpr.value.trim());
+        requiresModal.classList.add('hidden');
+    });
+
+    function refreshRequiresItemSelect() {
+        requiresItemSelect.innerHTML = '<option value="">選擇道具插入</option>';
+        items_list.forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = item.name; opt.textContent = item.name;
+            requiresItemSelect.appendChild(opt);
+        });
+    }
+    // #endregion
 
     editIsChallenge.addEventListener('change', renderActionsList);
 
@@ -424,6 +581,8 @@
             editingActions.push({ type: 'change_draw_player', on: 'always', target: 'skip:1' });
         else if (type === 'change_deck')
             editingActions.push({ type: 'change_deck', on: 'always', target: Object.keys(decks_list)[0] || '' });
+        else if (type === 'item_changes')
+            editingActions.push({ type: 'item_changes', on: 'always', target: 'skip:0', give: [], take: [] });
         renderActionsList();
     });
     // #endregion
@@ -441,6 +600,8 @@
         card.effect       = editCardEffect.value.trim();
         card.rarity       = parseInt(editCardRarity.value) || 1;
         card.is_challenge = editIsChallenge.checked || undefined;
+        const reqExpr = btnEditRequires.classList.contains('empty') ? '' : btnEditRequires.textContent.trim();
+        card.requires = reqExpr || undefined;
         card.actions      = editingActions.length ? editingActions.map(a => ({ ...a })) : undefined;
         delete card.score_changes;
         delete card.score_success;
@@ -450,8 +611,8 @@
     }
 
     function deleteCard(name) {
-        if (!name || !cards[name]) return;
-        if (!confirm(`確定刪除卡牌「${name}」？`)) return;
+        if (!name || !cards[name]) return false;
+        if (!confirm(`確定刪除卡牌「${name}」？`)) return false;
         delete cards[name];
         const el = document.getElementById(`card-${name}`);
         if (el) el.remove();
@@ -465,6 +626,7 @@
         const first = Object.keys(cards)[0];
         if (first) loadCardToEditor(first);
         else { inputCardSearch.value = ''; refreshToolbar(); }
+        return true;
     }
     // #endregion
 
@@ -475,7 +637,7 @@
         cardListModal.classList.add('hidden');
         const data = await getDeckData();
         if (!data) {
-            gbCardList.innerHTML = '<p style="color:var(--primary-red); padding:var(--gap);">資料載入失敗，請至「設定」頁面匯入資料。</p>';
+            renderAlert(labelAlert, '資料載入失敗，請至「設定」頁面匯入資料。', 'red');
             return;
         }
         cards = {};
@@ -483,12 +645,15 @@
         roles = (data.roles || []).map(r => ({ name: r.name }));
         decks_list = {};
         (data.decks || []).forEach(d => { decks_list[d.name] = d; });
+        items_list = data.items || [];
+        refreshRequiresItemSelect();
         data.cards.forEach(c => { cards[c.name] = c; renderCard(c); });
 
         // 預設選第一張卡牌
         const first = Object.keys(cards)[0];
         if (first) loadCardToEditor(first);
         else refreshToolbar();
+        renderAlert(labelAlert, null, 'red');
     }
 
     initCardEditors();

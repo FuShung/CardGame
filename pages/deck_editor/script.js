@@ -2,22 +2,23 @@
     // #region --- 變數 ---
 
     // UI 控件
-    const gbButtons = document.getElementById("btn-group");
-    const inputDeckName = document.getElementById("input-deck-name");
-    const btnEditDeck = document.getElementById("btn-edit-deck");
-    const btnDeleteDeck = document.getElementById("btn-delete-deck");
-    const gbDeckList = document.getElementById("deck-list");
-    const deckEditModal = document.getElementById("decks-editor-modal");
-    const editDeckName = document.getElementById("edit-deck-name");
-    const editDeckMode = document.getElementById("edit-deck-mode");
-    const lbEditorModeTitle = document.getElementById("editor-mode-title");
-    const lbDeckTotalCount = document.getElementById("editor-total-count");
-    const editorAddButtons = document.getElementById("editor-add-buttons");
+    const gbButtons           = document.getElementById("btn-group");
+    const inputDeckName       = document.getElementById("input-deck-name");
+    const btnEditDeck         = document.getElementById("btn-edit-deck");
+    const btnDeleteDeck       = document.getElementById("btn-delete-deck");
+    const gbDeckList          = document.getElementById("deck-list");
+    const deckEditModal       = document.getElementById("decks-editor-modal");
+    const editDeckName        = document.getElementById("edit-deck-name");
+    const editDeckMode        = document.getElementById("edit-deck-mode");
+    const lbEditorModeTitle   = document.getElementById("editor-mode-title");
+    const lbDeckTotalCount    = document.getElementById("editor-total-count");
+    const editorAddButtons    = document.getElementById("editor-add-buttons");
     const editorListContainer = document.getElementById("editor-list-container");
-    const btnCancelEdit = document.getElementById("btn-cancel-edit");
-    const btnSaveEdit = document.getElementById("btn-save-edit");
-    const tabCards = document.getElementById("tab-cards");
-    const tabDecks = document.getElementById("tab-decks");
+    const btnCancelEdit       = document.getElementById("btn-cancel-edit");
+    const btnSaveEdit         = document.getElementById("btn-save-edit");
+    const tabCards            = document.getElementById("tab-cards");
+    const tabDecks            = document.getElementById("tab-decks");
+    const labelAlert          = document.getElementById('deck-editor-alert');
 
     // 資料
     var cards = [];       // 所有卡牌名稱清單
@@ -107,7 +108,10 @@
         const deleteBtn = document.createElement('button');
         deleteBtn.className = "btn-outline-red";
         deleteBtn.innerText = "刪除";
-        deleteBtn.onclick = () => deleteDeck(deck.name);
+        deleteBtn.onclick = () => { 
+            if(deleteDeck(deck.name))
+                renderAlert(labelAlert, `牌組 [${deck.name}] 刪除完成`, 'red');
+        }
 
         btnGroup.appendChild(editBtn);
         btnGroup.appendChild(deleteBtn);
@@ -130,7 +134,9 @@
     }
 
     function deleteInputDeck() {
-        deleteDeck(inputDeckName.value.trim());
+        const name = inputDeckName.value.trim();
+        if(deleteDeck(name))
+            renderAlert(labelAlert, `牌組 [${val}] 刪除完成`, 'red');
     }
 
     // 開啟牌組編輯器（新增或修改）
@@ -171,7 +177,7 @@
     }
 
     function deleteDeck(deckName) {
-        if (!deckName) return;
+        if (!deckName) return false;
         if (confirm(`確定刪除牌組 ${deckName}？`)) {
             delete decks[deckName];
             const deckElement = document.getElementById(`deck-${deckName}`);
@@ -179,7 +185,10 @@
             saveDecks();
             inputDeckName.value = "";
             renderButtons();
+            return true;
         }
+
+        return false;
     }
 
     function switchVisible(deckName) {
@@ -437,6 +446,7 @@
             deckEditModal.classList.add("hidden");
         }
         editingPool = [];
+        renderAlert(labelAlert);
     }
 
     // 儲存編輯結果
@@ -461,6 +471,7 @@
         refreshDeckCount(deckName);
         saveDecks();
         closeDeckEditor();
+        renderAlert(labelAlert, `牌組 [${deckName}] 儲存完成`, 'green');
     }
     // #endregion
 
@@ -485,7 +496,7 @@
 
         const data = await getDeckData();
         if(!data) {
-            gbDeckList.innerHTML = '<p style="color:var(--primary-red); padding:var(--gap);">資料載入失敗，請至「資料備份」頁面匯入資料。</p>';
+            renderAlert(labelAlert, `資料載入失敗，請至「資料備份」頁面匯入資料。`, 'red');
             return;
         }
 
@@ -499,6 +510,8 @@
             decks[deck.name] = deck;
             renderDeck(deck);
         });
+        
+        renderAlert(labelAlert);
     }
 
     initDeckEditor();

@@ -10,7 +10,7 @@
 .glass-card {
   /* 基礎版型與間距 */
   width: 100%;
-  max-width: 50rem;
+  max-width: var(--body-width);
   padding: var(--gap);
   margin: var(--gap);
   display: flex;
