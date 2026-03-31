@@ -91,6 +91,7 @@ function switchNavTab(button, page, config) {
     url.searchParams.set('page', page);
     window.history.pushState({}, '', url);
 }
+
 async function renderPage(page, config) {
     // 切換頁面前先執行清理（清除計時器等背景資源）
     _cleanupCurrentPage();
@@ -240,5 +241,17 @@ function renderStarts(container, value) {
             star.classList.remove('active');
         }
     });
+}
+
+// alert標籤
+function renderAlert(label, text = false, color='red') {
+    if(text) {
+        label.innerText = text;
+        label.className = `alert-${color}`;
+    }
+    else {
+        label.innerText = '';
+        label.className = 'hidden';
+    }
 }
 // #endregion

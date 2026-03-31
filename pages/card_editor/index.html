@@ -8,7 +8,7 @@
     <button id="btn-save-edit" class="btn-lg btn-primary-green">儲存</button>
     <button id="btn-delete-card" class="btn-lg btn-primary-red disabled">刪除</button>
 </div>
-<br />
+<span id="card-editor-alert" class="hidden"></span>
 <h2 id="edit-card-name">卡牌</h2>
 <div id="edit-card-rarity-star" class="star-editor" for="edit-card-rarity"></div>
 <input id="edit-card-rarity" type="number" min="1" max="5" value="1" hidden>
@@ -38,10 +38,9 @@
     </select>
     <button id="btn-add-action" class="btn-outline-green">＋ 新增</button>
     <input id="edit-is-challenge" type="checkbox" class="input-check-green"
-        data-label-off="挑戰模式：關閉" data-label-on="挑戰模式：啟用">
-</div>
+        data-label-off="挑戰模式：關閉" data-label-on="挑戰模式：啟用"></div>
 <br />
-<div id="actions-list" class="full-w">
+<div id="actions-list" class="vec-list-container">
 </div>
 
 <div id="card-editor-modal" class="pop-modal hidden">

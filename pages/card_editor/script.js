@@ -17,6 +17,7 @@
     const requiresExpr       = document.getElementById('requires-expr');
     const requiresItemSelect = document.getElementById('requires-item-select');
     const actionsList        = document.getElementById('actions-list');
+    const labelAlert         = document.getElementById('card-editor-alert');
 
     var cards = {};
     var roles = [];
@@ -79,19 +80,23 @@
     btnSaveEdit.addEventListener('click', () => {
         const val = inputCardSearch.value.trim();
         if (!val) return;
+        let actionText = '儲存';
         if (!cards[val]) {
-            // 新增
+            actionText = '新增';
             cards[val] = { name: val, rarity: 1 };
             renderCard(cards[val]);
             loadCardToEditor(val);
-        } else {
-            // 儲存
-            saveEdit();
-        }
+        } 
+        saveEdit();
         refreshToolbar();
+        renderAlert(labelAlert, `卡牌 [${val}] ${actionText}完成`, 'green');
     });
 
-    btnDeleteCard.addEventListener('click', () => deleteCard(inputCardSearch.value.trim()));
+    btnDeleteCard.addEventListener('click', () => {
+        const name = inputItemSearch.value.trim();
+        if(deleteCard(name))
+            renderAlert(labelAlert, `卡牌 [${name}] 刪除完成`, 'red');
+    });
     // #endregion
 
     // #region --- 卡牌列表 ---
@@ -117,7 +122,10 @@
         const deleteBtn = document.createElement('button');
         deleteBtn.className = "btn-outline-red";
         deleteBtn.innerText = "刪除";
-        deleteBtn.onclick = () => deleteCard(card.name);
+        deleteBtn.onclick = () => { 
+            if(deleteCard(card.name))
+                renderAlert(labelAlert, `卡牌 [${card.name}] 刪除完成`, 'red');
+        };
         btnGroup.appendChild(selectBtn);
         btnGroup.appendChild(deleteBtn);
         d.appendChild(btnGroup);
@@ -407,11 +415,15 @@
 
         } else if (action.type === 'item_changes') {
             lbAction.innerText = '道具';
-            // 切換按鈕：給予 / 移除（仿挑戰模式）
+
+            // 相容舊格式（字串陣列）
+            const normalizeList = arr => (arr || []).map(e =>
+                typeof e === 'string' ? { item: e, count: 1 } : e);
+            editingActions[idx].give = normalizeList(action.give);
+            editingActions[idx].take = normalizeList(action.take);
+
+            // 切換按鈕：給予 / 移除
             const modeBtn = document.createElement('button');
-            modeBtn.style.width = '5rem';
-            modeBtn.style.flexShrink = '0';
-            const isGive = !action.take || !action.take.length;
             function updateModeBtn() {
                 const give = !editingActions[idx].take?.length;
                 modeBtn.textContent = give ? '給予' : '移除';
@@ -419,36 +431,49 @@
             }
             modeBtn.addEventListener('click', () => {
                 const a = editingActions[idx];
-                if (!a.take?.length) {
-                    // 切換到移除：把 give 的內容移到 take
-                    a.take = a.give || [];
-                    a.give = [];
-                } else {
-                    a.give = a.take;
-                    a.take = [];
-                }
+                if (!a.take?.length) { a.take = a.give; a.give = []; }
+                else                 { a.give = a.take; a.take = []; }
                 updateModeBtn();
             });
             updateModeBtn();
-
-            const itemInput = document.createElement('input');
-            itemInput.type = 'text';
-            itemInput.placeholder = '道具A, 道具B';
-            itemInput.value = (isGive ? action.give : action.take || []).join(', ');
-            itemInput.addEventListener('input', () => {
-                const vals = itemInput.value.split(',').map(s => s.trim()).filter(Boolean);
-                const give = !editingActions[idx].take?.length;
-                if (give) { editingActions[idx].give = vals; editingActions[idx].take = []; }
-                else      { editingActions[idx].take = vals; editingActions[idx].give = []; }
-            });
 
             const targetSel = document.createElement('select');
             buildTargetOptions(targetSel, action.target || 'skip:0');
             targetSel.addEventListener('change', () => { editingActions[idx].target = targetSel.value; });
 
+            // 道具下拉選單
+            const itemSel = document.createElement('select');
+            itemSel.innerHTML = '<option value="">選擇道具</option>';
+            items_list.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.name;
+                opt.textContent = item.name;
+                itemSel.appendChild(opt);
+            });
+            // 選擇後同步到 give/take（依目前模式）
+            itemSel.addEventListener('change', () => {
+                const name = itemSel.value;
+                if (!name) return;
+                const a = editingActions[idx];
+                const give = !a.take?.length;
+                const arr = give ? a.give : a.take;
+                const count = Math.max(1, parseInt(countInput.value) || 1);
+                const existing = arr.find(e => e.item === name);
+                if (existing) existing.count = count;
+                else arr.push({ item: name, count });
+                updateModeBtn();
+            });
+
+            // 數量輸入
+            const countInput = document.createElement('input');
+            countInput.type = 'number';
+            countInput.min = '1';
+            countInput.value = '1';
+
             inner.appendChild(modeBtn);
             inner.appendChild(targetSel);
-            inner.appendChild(itemInput);
+            inner.appendChild(itemSel);
+            inner.appendChild(countInput);
         }
 
         inner.appendChild(buildDelBtn(idx));
@@ -586,8 +611,8 @@
     }
 
     function deleteCard(name) {
-        if (!name || !cards[name]) return;
-        if (!confirm(`確定刪除卡牌「${name}」？`)) return;
+        if (!name || !cards[name]) return false;
+        if (!confirm(`確定刪除卡牌「${name}」？`)) return false;
         delete cards[name];
         const el = document.getElementById(`card-${name}`);
         if (el) el.remove();
@@ -601,6 +626,7 @@
         const first = Object.keys(cards)[0];
         if (first) loadCardToEditor(first);
         else { inputCardSearch.value = ''; refreshToolbar(); }
+        return true;
     }
     // #endregion
 
@@ -611,7 +637,7 @@
         cardListModal.classList.add('hidden');
         const data = await getDeckData();
         if (!data) {
-            gbCardList.innerHTML = '<p style="color:var(--primary-red); padding:var(--gap);">資料載入失敗，請至「設定」頁面匯入資料。</p>';
+            renderAlert(labelAlert, '資料載入失敗，請至「設定」頁面匯入資料。', 'red');
             return;
         }
         cards = {};
@@ -627,6 +653,7 @@
         const first = Object.keys(cards)[0];
         if (first) loadCardToEditor(first);
         else refreshToolbar();
+        renderAlert(labelAlert, null, 'red');
     }
 
     initCardEditors();

@@ -66,7 +66,6 @@
     var drawMode = ROUND_PLAYER;
     var drawModeRole = '';
     var overridePlayer = null;
-    var pendingKeepDrawer = null; // 舊格式相容，保留
     var currentDrawerIdx = 0;
     var nextUnknown = false;
     var pendingScoreChanges = [];
@@ -215,7 +214,7 @@
     document.getElementById('btn-add-player').addEventListener('click', () => { players.push({ name: '', role: '' }); renderSetupList(); });
     document.getElementById('btn-start-game').addEventListener('click', startGame);
     document.getElementById('btn-restart-game').addEventListener('click', () => {
-        currentPlayerIdx = 0; pendingKeepDrawer = null; currentDrawerIdx = 0;
+        currentPlayerIdx = 0; currentDrawerIdx = 0;
         nextUnknown = false; pendingScoreChanges = []; overridePlayer = null;
         renderSetupList(); showSetup();
     });

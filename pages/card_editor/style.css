@@ -73,11 +73,6 @@
     overflow-y: auto;
 }
 
-#card-editor-modal > .input-container,
-#card-editor-modal > .input-container > button {
-    width: 100%;
-}
-
 #edit-card-effect {
     min-height: 8rem;
     width: 100%;
@@ -148,20 +143,6 @@
 .card-info > .star.active {
     pointer-events: none;
     font-size: var(--text-small-size);
-}
-/* #endregion */
-
-/* #region --- 效果列表 --- */
-#btn-add-action {
-    flex-shrink: 0;
-    width: auto;
-}
-
-#actions-list .input-container > button:last-child {
-    width: 3rem;
-    min-width: 3rem;
-    flex-shrink: 0;
-    padding: 0;
 }
 /* #endregion */
 

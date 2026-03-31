@@ -129,18 +129,24 @@ function applyActions(card, trigger, state) {
 
         } else if (action.type === 'item_changes') {
             const targets = resolveTarget(action.target || 'skip:0', state);
+            // 相容舊格式（字串陣列）與新格式（{ item, count } 陣列）
+            const normalizeList = arr => (arr || []).map(e =>
+                typeof e === 'string' ? { item: e, count: 1 } : e);
+            const giveList = normalizeList(action.give);
+            const takeList = normalizeList(action.take);
             targets.forEach(idx => {
                 const p = state.players[idx];
                 if (!p) return;
                 if (!p.items) p.items = [];
-                if (action.give) {
-                    action.give.forEach(item => { if (!p.items.includes(item)) p.items.push(item); });
-                }
-                if (action.take) {
-                    action.take.forEach(item => { p.items = p.items.filter(i => i !== item); });
-                }
+                giveList.forEach(({ item, count }) => {
+                    for (let i = 0; i < (count || 1); i++) p.items.push(item);
+                });
+                takeList.forEach(({ item, count }) => {
+                    let n = count || 1;
+                    p.items = p.items.filter(i => { if (i === item && n > 0) { n--; return false; } return true; });
+                });
             });
-            results.push({ kind: 'item_changes', targetLabel: resolveTargetLabel(action.target || 'skip:0', state), give: action.give || [], take: action.take || [] });
+            results.push({ kind: 'item_changes', targetLabel: resolveTargetLabel(action.target || 'skip:0', state), give: giveList, take: takeList });
         }
     });
 
@@ -212,8 +218,8 @@ function formatActionResult(r, state) {
     if (r.kind === 'change_deck') return `切換牌組：${r.target}`;
     if (r.kind === 'item_changes') {
         const parts = [];
-        if (r.give.length) parts.push(`獲得：${r.give.join('、')}`);
-        if (r.take.length) parts.push(`失去：${r.take.join('、')}`);
+        if (r.give.length) parts.push(`獲得：${r.give.map(e => e.count > 1 ? `${e.item}×${e.count}` : e.item).join('、')}`);
+        if (r.take.length) parts.push(`失去：${r.take.map(e => e.count > 1 ? `${e.item}×${e.count}` : e.item).join('、')}`);
         return `${r.targetLabel}道具 ${parts.join('，')}`;
     }
     return '';
@@ -319,18 +325,23 @@ function checkItemChangesEligible(card, state) {
         const target = action.target || 'skip:0';
         if (target !== 'skip:0' && target !== 'current') continue;
 
-        // take：玩家必須持有
+        const normalizeList = arr => (arr || []).map(e =>
+            typeof e === 'string' ? { item: e, count: 1 } : e);
+        // take：玩家必須持有足夠數量
         if (action.take && action.take.length) {
-            if (action.take.some(item => !playerItems.includes(item))) return false;
+            for (const { item, count } of normalizeList(action.take)) {
+                const owned = playerItems.filter(i => i === item).length;
+                if (owned < (count || 1)) return false;
+            }
         }
         // give：玩家持有數量未達 max_count
         if (action.give && action.give.length) {
-            for (const itemName of action.give) {
-                const def = itemDefs[itemName];
+            for (const { item, count } of normalizeList(action.give)) {
+                const def = itemDefs[item];
                 const maxCount = def?.max_count ?? 1;
                 if (maxCount > 0) {
-                    const owned = playerItems.filter(i => i === itemName).length;
-                    if (owned >= maxCount) return false;
+                    const owned = playerItems.filter(i => i === item).length;
+                    if (owned + (count || 1) > maxCount) return false;
                 }
             }
         }

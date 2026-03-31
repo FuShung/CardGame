@@ -10,6 +10,7 @@
     const editItemName    = document.getElementById('edit-item-name');
     const editItemDesc    = document.getElementById('edit-item-desc');
     const editItemMax     = document.getElementById('edit-item-max');
+    const labelAlert      = document.getElementById('item-editor-alert');
 
     var items = {};       // { name: { name, description, max_count, properties } }
     var editingItem = null;
@@ -40,6 +41,7 @@
                 inputItemSearch.value = name;
                 hideDropdown();
                 loadItemToEditor(name);
+                renderAlert(labelAlert);
             });
             itemDropdown.appendChild(li);
         });
@@ -59,17 +61,25 @@
     btnSaveItem.addEventListener('click', () => {
         const val = inputItemSearch.value.trim();
         if (!val) return;
+        let actionText = '儲存';
         if (!items[val]) {
+            actionText = '新增';
             items[val] = { name: val, max_count: 1 };
             renderItemCard(items[val]);
             loadItemToEditor(val);
-        } else {
-            saveEdit();
         }
+        
+        saveEdit();
         refreshToolbar();
+        
+        renderAlert(labelAlert, `道具 [${val}] ${actionText}完成`, 'green');
     });
 
-    btnDeleteItem.addEventListener('click', () => deleteItem(inputItemSearch.value.trim()));
+    btnDeleteItem.addEventListener('click', () => { 
+        const name = inputItemSearch.value.trim();
+        if(deleteItem(name))
+            renderAlert(labelAlert, `道具 [${name}] 刪除完成`, 'red');
+    });
     // #endregion
 
     // #region --- 道具列表 ---
@@ -91,11 +101,18 @@
         const selectBtn = document.createElement('button');
         selectBtn.className = 'btn-outline-blue';
         selectBtn.innerText = '選擇';
-        selectBtn.onclick = () => { loadItemToEditor(item.name); itemListModal.classList.add('hidden'); };
+        selectBtn.onclick = () => { 
+            loadItemToEditor(item.name); 
+            itemListModal.classList.add('hidden');
+            renderAlert(labelAlert);
+        };
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'btn-outline-red';
         deleteBtn.innerText = '刪除';
-        deleteBtn.onclick = () => deleteItem(item.name);
+        deleteBtn.onclick = () => { 
+            if(deleteItem(item.name))
+                renderAlert(labelAlert, `道具 [${card.name}] 刪除完成`, 'red');
+        };
         btnGroup.appendChild(selectBtn);
         btnGroup.appendChild(deleteBtn);
         d.appendChild(btnGroup);
@@ -125,8 +142,8 @@
     }
 
     function deleteItem(name) {
-        if (!name || !items[name]) return;
-        if (!confirm(`確定刪除道具「${name}」？`)) return;
+        if (!name || !items[name]) return false;
+        if (!confirm(`確定刪除道具「${name}」？`)) return false;
         delete items[name];
         const el = document.getElementById(`item-${name}`);
         if (el) el.remove();
@@ -140,6 +157,7 @@
         const first = Object.keys(items)[0];
         if (first) loadItemToEditor(first);
         else { inputItemSearch.value = ''; refreshToolbar(); }
+        return true;
     }
     // #endregion
 
@@ -163,7 +181,7 @@
         itemListModal.classList.add('hidden');
         const data = await getDeckData();
         if (!data) {
-            gbItemList.innerHTML = '<p style="color:var(--primary-red);padding:var(--gap)">資料載入失敗。</p>';
+            renderAlert(labelAlert, '資料載入失敗。', 'red');
             return;
         }
         items = {};
@@ -172,6 +190,7 @@
         const first = Object.keys(items)[0];
         if (first) loadItemToEditor(first);
         else refreshToolbar();
+        renderAlert(labelAlert);
     }
 
     initItemEditor();
